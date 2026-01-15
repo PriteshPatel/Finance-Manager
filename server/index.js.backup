@@ -1,0 +1,460 @@
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const morgan = require('morgan');
+const { createClient } = require('@supabase/supabase-js');
+const { MongoClient, ObjectId } = require('mongodb');
+
+const app = express();
+const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 4000;
+
+// MongoDB connection
+const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
+const dbName = process.env.MONGODB_DB || 'finance_manager';
+let db;
+
+// Connect to MongoDB
+MongoClient.connect(mongoUri)
+  .then(client => {
+    console.log('Connected to MongoDB');
+    db = client.db(dbName);
+  })
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1);
+  });
+
+// Initialize Supabase client for auth validation
+const supabase = createClient(
+  process.env.SUPABASE_URL || 'https://cdoskhurtugckfpwmrjf.supabase.co',
+  process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkb3NraHVydHVnY2tmcHdtcmpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyMjMyNDUsImV4cCI6MjA4Mzc5OTI0NX0.qmqYkcN8_YmhYMcgopcHe3AMk1RrQIb9JGe4CMI05ks'
+);
+
+app.use(cors({ origin: '*', methods: ['GET','POST','PUT','DELETE','OPTIONS'] }));
+app.use(express.json());
+app.use(morgan('dev'));
+
+// Middleware to verify access token
+async function verifyToken(req, res, next) {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Missing or invalid authorization header' });
+    }
+    
+    const token = authHeader.substring(7);
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    
+    if (error || !user) {
+      console.log('Token validation error:', error?.message);
+      return res.status(401).json({ error: 'Invalid or expired token' });
+    }
+    
+    req.userId = user.id;
+    next();
+  } catch (error) {
+    console.error('Auth middleware error:', error);
+    res.status(401).json({ error: 'Unauthorized' });
+  }
+}
+
+// Health check
+app.get('/health', (_req, res) => {
+  res.json({ status: 'ok' });
+});
+
+// Placeholder root
+app.get('/', (_req, res) => {
+  res.json({ message: 'Finance Manager Node server running' });
+});
+
+// ============= EXPENSE ENDPOINTS =============
+
+// Get all expenses for user
+app.get('/expenses', verifyToken, (_req, res) => {
+  try {
+    const userId = _req.userId;
+    const userExpenses = storage.expenses[userId] || [];
+    res.json({ expenses: userExpenses });
+  } catch (error) {
+    console.error('Error fetching expenses:', error);
+    res.status(500).json({ error: 'Failed to fetch expenses' });
+  }
+});
+
+// Create expense
+app.post('/expenses', verifyToken, (req, res) => {
+  try {
+    const userId = req.userId;
+    const { amount, category, description, date, recurring, tags } = req.body;
+    
+    if (!storage.expenses[userId]) {
+      storage.expenses[userId] = [];
+    }
+    
+    const expense = {
+      id: Date.now().toString(),
+      userId,
+      amount: parseFloat(amount),
+      category,
+      description,
+      date,
+      recurring: recurring || false,
+      tags: tags || [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    
+    storage.expenses[userId].push(expense);
+    res.status(201).json({ expense });
+  } catch (error) {
+    console.error('Error creating expense:', error);
+    res.status(500).json({ error: 'Failed to create expense' });
+  }
+});
+
+// Update expense
+app.put('/expenses/:id', verifyToken, (req, res) => {
+  try {
+    const userId = req.userId;
+    const expenseId = req.params.id;
+    const updates = req.body;
+    
+    if (!storage.expenses[userId]) {
+      return res.status(404).json({ error: 'Expense not found' });
+    }
+    
+    const expenseIndex = storage.expenses[userId].findIndex(e => e.id === expenseId);
+    if (expenseIndex === -1) {
+      return res.status(404).json({ error: 'Expense not found' });
+    }
+    
+    storage.expenses[userId][expenseIndex] = {
+      ...storage.expenses[userId][expenseIndex],
+      ...updates,
+      updatedAt: new Date().toISOString(),
+    };
+    
+    res.json({ expense: storage.expenses[userId][expenseIndex] });
+  } catch (error) {
+    console.error('Error updating expense:', error);
+    res.status(500).json({ error: 'Failed to update expense' });
+  }
+});
+
+// Delete expense
+app.delete('/expenses/:id', verifyToken, (req, res) => {
+  try {
+    const userId = req.userId;
+    const expenseId = req.params.id;
+    
+    if (!storage.expenses[userId]) {
+      return res.status(404).json({ error: 'Expense not found' });
+    }
+    
+    storage.expenses[userId] = storage.expenses[userId].filter(e => e.id !== expenseId);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting expense:', error);
+    res.status(500).json({ error: 'Failed to delete expense' });
+  }
+});
+
+// ============= INCOME ENDPOINTS =============
+
+// Get all income for user
+app.get('/income', verifyToken, (_req, res) => {
+  try {
+    const userId = _req.userId;
+    const userIncome = storage.income[userId] || [];
+    res.json({ income: userIncome });
+  } catch (error) {
+    console.error('Error fetching income:', error);
+    res.status(500).json({ error: 'Failed to fetch income' });
+  }
+});
+
+// Create income
+app.post('/income', verifyToken, (req, res) => {
+  try {
+    const userId = req.userId;
+    const { amount, source, date, description, recurring } = req.body;
+    
+    if (!storage.income[userId]) {
+      storage.income[userId] = [];
+    }
+    
+    const income = {
+      id: Date.now().toString(),
+      userId,
+      amount: parseFloat(amount),
+      source,
+      date,
+      description: description || '',
+      recurring: recurring || false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    
+    storage.income[userId].push(income);
+    res.status(201).json({ income });
+  } catch (error) {
+    console.error('Error creating income:', error);
+    res.status(500).json({ error: 'Failed to create income' });
+  }
+});
+
+// Update income
+app.put('/income/:id', verifyToken, (req, res) => {
+  try {
+    const userId = req.userId;
+    const incomeId = req.params.id;
+    const updates = req.body;
+    
+    if (!storage.income[userId]) {
+      return res.status(404).json({ error: 'Income not found' });
+    }
+    
+    const incomeIndex = storage.income[userId].findIndex(i => i.id === incomeId);
+    if (incomeIndex === -1) {
+      return res.status(404).json({ error: 'Income not found' });
+    }
+    
+    storage.income[userId][incomeIndex] = {
+      ...storage.income[userId][incomeIndex],
+      ...updates,
+      updatedAt: new Date().toISOString(),
+    };
+    
+    res.json({ income: storage.income[userId][incomeIndex] });
+  } catch (error) {
+    console.error('Error updating income:', error);
+    res.status(500).json({ error: 'Failed to update income' });
+  }
+});
+
+// Delete income
+app.delete('/income/:id', verifyToken, (req, res) => {
+  try {
+    const userId = req.userId;
+    const incomeId = req.params.id;
+    
+    if (!storage.income[userId]) {
+      return res.status(404).json({ error: 'Income not found' });
+    }
+    
+    storage.income[userId] = storage.income[userId].filter(i => i.id !== incomeId);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting income:', error);
+    res.status(500).json({ error: 'Failed to delete income' });
+  }
+});
+
+// ============= ASSET ENDPOINTS =============
+
+// Get all assets for user
+app.get('/assets', verifyToken, (_req, res) => {
+  try {
+    const userId = _req.userId;
+    const userAssets = storage.assets[userId] || [];
+    res.json({ assets: userAssets });
+  } catch (error) {
+    console.error('Error fetching assets:', error);
+    res.status(500).json({ error: 'Failed to fetch assets' });
+  }
+});
+
+// Create asset
+app.post('/assets', verifyToken, (req, res) => {
+  try {
+    const userId = req.userId;
+    const { name, type, currentValue, purchasePrice, purchaseDate } = req.body;
+    
+    if (!storage.assets[userId]) {
+      storage.assets[userId] = [];
+    }
+    
+    const asset = {
+      id: Date.now().toString(),
+      userId,
+      name,
+      type,
+      currentValue: parseFloat(currentValue),
+      purchasePrice: parseFloat(purchasePrice),
+      purchaseDate,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    
+    storage.assets[userId].push(asset);
+    res.status(201).json({ asset });
+  } catch (error) {
+    console.error('Error creating asset:', error);
+    res.status(500).json({ error: 'Failed to create asset' });
+  }
+});
+
+// ============= BUDGET ENDPOINTS =============
+
+// Get all budgets for user
+app.get('/budgets', verifyToken, (_req, res) => {
+  try {
+    const userId = _req.userId;
+    const userBudgets = storage.budgets[userId] || [];
+    res.json({ budgets: userBudgets });
+  } catch (error) {
+    console.error('Error fetching budgets:', error);
+    res.status(500).json({ error: 'Failed to fetch budgets' });
+  }
+});
+
+// Create budget
+app.post('/budgets', verifyToken, (req, res) => {
+  try {
+    const userId = req.userId;
+    const { category, limit, period } = req.body;
+    
+    if (!storage.budgets[userId]) {
+      storage.budgets[userId] = [];
+    }
+    
+    const budget = {
+      id: Date.now().toString(),
+      userId,
+      category,
+      limit: parseFloat(limit),
+      period,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    
+    storage.budgets[userId].push(budget);
+    res.status(201).json({ budget });
+  } catch (error) {
+    console.error('Error creating budget:', error);
+    res.status(500).json({ error: 'Failed to create budget' });
+  }
+});
+
+// ============= BANK ACCOUNT ENDPOINTS =============
+
+// Get all bank accounts for user
+app.get('/bank-accounts', verifyToken, (_req, res) => {
+  try {
+    const userId = _req.userId;
+    const userBankAccounts = storage.bankAccounts[userId] || [];
+    res.json({ bankAccounts: userBankAccounts });
+  } catch (error) {
+    console.error('Error fetching bank accounts:', error);
+    res.status(500).json({ error: 'Failed to fetch bank accounts' });
+  }
+});
+
+// Create bank account
+app.post('/bank-accounts', verifyToken, (req, res) => {
+  try {
+    const userId = req.userId;
+    const { accountName, bankName, accountNumber, accountType, balance, currency } = req.body;
+    
+    if (!storage.bankAccounts[userId]) {
+      storage.bankAccounts[userId] = [];
+    }
+    
+    const bankAccount = {
+      id: Date.now().toString(),
+      userId,
+      accountName,
+      bankName,
+      accountNumber,
+      accountType,
+      balance: parseFloat(balance),
+      currency: currency || 'USD',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    
+    storage.bankAccounts[userId].push(bankAccount);
+    res.status(201).json({ bankAccount });
+  } catch (error) {
+    console.error('Error creating bank account:', error);
+    res.status(500).json({ error: 'Failed to create bank account' });
+  }
+});
+
+// Update bank account
+app.put('/bank-accounts/:id', verifyToken, (req, res) => {
+  try {
+    const userId = req.userId;
+    const accountId = req.params.id;
+    const updates = req.body;
+    
+    if (!storage.bankAccounts[userId]) {
+      return res.status(404).json({ error: 'Bank account not found' });
+    }
+    
+    const accountIndex = storage.bankAccounts[userId].findIndex(a => a.id === accountId);
+    if (accountIndex === -1) {
+      return res.status(404).json({ error: 'Bank account not found' });
+    }
+    
+    storage.bankAccounts[userId][accountIndex] = {
+      ...storage.bankAccounts[userId][accountIndex],
+      ...updates,
+      updatedAt: new Date().toISOString(),
+    };
+    
+    res.json({ bankAccount: storage.bankAccounts[userId][accountIndex] });
+  } catch (error) {
+    console.error('Error updating bank account:', error);
+    res.status(500).json({ error: 'Failed to update bank account' });
+  }
+});
+
+// Delete bank account
+app.delete('/bank-accounts/:id', verifyToken, (req, res) => {
+  try {
+    const userId = req.userId;
+    const accountId = req.params.id;
+    
+    if (!storage.bankAccounts[userId]) {
+      return res.status(404).json({ error: 'Bank account not found' });
+    }
+    
+    storage.bankAccounts[userId] = storage.bankAccounts[userId].filter(a => a.id !== accountId);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting bank account:', error);
+    res.status(500).json({ error: 'Failed to delete bank account' });
+  }
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not Found' });
+});
+
+// Error handler
+app.use((err, _req, res, _next) => {
+  console.error('Server error:', err);
+  res.status(500).json({ error: 'Internal Server Error' });
+});
+
+function startServer(port, attemptsLeft = 5) {
+  const server = app.listen(port, () => {
+    console.log(`Server listening on http://localhost:${port}`);
+  });
+
+  server.on('error', (err) => {
+    if (err && err.code === 'EADDRINUSE' && attemptsLeft > 0) {
+      const nextPort = port + 1;
+      console.warn(`Port ${port} in use, trying ${nextPort}...`);
+      setTimeout(() => startServer(nextPort, attemptsLeft - 1), 250);
+    } else {
+      console.error('Failed to start server:', err);
+      process.exit(1);
+    }
+  });
+}
+
+startServer(DEFAULT_PORT);
