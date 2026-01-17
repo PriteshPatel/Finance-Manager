@@ -5,8 +5,9 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Plus, Pencil, Trash2, TrendingUp, DollarSign } from 'lucide-react';
+import { Plus, Pencil, Trash2, TrendingUp, IndianRupee  } from 'lucide-react';
 import { API_BASE_URL } from '../../api-config';
+import { formatCurrency } from '../../lib/currency-config';
 
 interface Income {
   id: string;
@@ -33,6 +34,7 @@ const INCOME_SOURCES = [
   'Bonus',
   'Gift',
   'Refund',
+  'Farming',
   'Other',
 ];
 
@@ -157,10 +159,10 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Income</CardTitle>
-            <DollarSign className="h-4 w-4 text-green-600" />
+            <IndianRupee className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">${totalIncome.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-green-600">{formatCurrency(totalIncome)}</div>
             <p className="text-xs text-muted-foreground">All-time total</p>
           </CardContent>
         </Card>
@@ -171,7 +173,7 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
             <TrendingUp className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">${currentMonthIncome.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-green-600">{formatCurrency(currentMonthIncome)}</div>
             <p className="text-xs text-muted-foreground">Current month income</p>
           </CardContent>
         </Card>
@@ -339,7 +341,7 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
                       <div className="flex items-center gap-2">
                         <div className="text-right mr-4">
                           <p className="text-xl font-bold text-green-600">
-                            ${item.amount.toLocaleString()}
+                            {formatCurrency(item.amount)}
                           </p>
                         </div>
                         <Button

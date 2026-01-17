@@ -14,6 +14,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts';
+import { formatCurrency } from '../../lib/currency-config';
 
 interface Expense {
   id: string;
@@ -125,7 +126,7 @@ export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashbo
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={(entry) => `${entry.name}: $${entry.value.toLocaleString()}`}
+                    label={(entry) => `${entry.name}: ${formatCurrency(entry.value)}`}
                     outerRadius={80}
                     fill="#8884d8"
                     dataKey="value"
@@ -159,7 +160,7 @@ export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashbo
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={(entry) => `${entry.name}: $${entry.value.toLocaleString()}`}
+                    label={(entry) => `${entry.name}: ${formatCurrency(entry.value)}`}
                     outerRadius={80}
                     fill="#82ca9d"
                     dataKey="value"
@@ -253,8 +254,7 @@ export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashbo
                   {assetPerformance.map((asset, index) => (
                     <tr key={index} className="border-b hover:bg-gray-50">
                       <td className="py-3 px-4">{asset.name}</td>
-                      <td className={`text-right py-3 px-4 ${asset.gain >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        ${asset.gain.toLocaleString()}
+                      <td className={`text-right py-3 px-4 ${asset.gain >= 0 ? 'text-green-600' : 'text-red-600'}`}>{formatCurrency(asset.gain)}
                       </td>
                       <td className={`text-right py-3 px-4 ${asset.gain >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                         {asset.percentage}%

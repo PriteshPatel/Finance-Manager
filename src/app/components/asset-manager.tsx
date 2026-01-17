@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Plus, Pencil, Trash2, TrendingUp, TrendingDown } from 'lucide-react';
 import { API_BASE_URL } from '../../api-config';
+import { formatCurrency } from '../../lib/currency-config';
 
 interface Asset {
   id: string;
@@ -269,17 +270,17 @@ export function AssetManager({ accessToken, assets, onRefresh }: AssetManagerPro
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="p-4 bg-blue-50 rounded-lg">
               <p className="text-sm text-gray-600 mb-1">Total Value</p>
-              <p className="text-2xl font-bold text-blue-600">${totalValue.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-blue-600">{formatCurrency(totalValue)}</p>
             </div>
             <div className="p-4 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-600 mb-1">Total Invested</p>
-              <p className="text-2xl font-bold text-gray-700">${totalInvested.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-gray-700">{formatCurrency(totalInvested)}</p>
             </div>
             <div className={`p-4 rounded-lg ${totalGain >= 0 ? 'bg-green-50' : 'bg-red-50'}`}>
               <p className="text-sm text-gray-600 mb-1">Total Gain/Loss</p>
               <div className="flex items-center gap-2">
                 <p className={`text-2xl font-bold ${totalGain >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  ${Math.abs(totalGain).toLocaleString()}
+                  {formatCurrency(Math.abs(totalGain))}
                 </p>
                 {totalGain >= 0 ? (
                   <TrendingUp className="h-5 w-5 text-green-600" />
@@ -324,7 +325,7 @@ export function AssetManager({ accessToken, assets, onRefresh }: AssetManagerPro
                         )}
                         <div className="flex gap-4 mt-2 text-sm text-gray-600">
                           <div>
-                            <span className="font-medium">Purchased:</span> ${asset.purchasePrice.toLocaleString()}
+                            <span className="font-medium">Purchased:</span> {formatCurrency(asset.purchasePrice)}
                           </div>
                           <div>
                             <span className="font-medium">Date:</span>{' '}
@@ -338,14 +339,14 @@ export function AssetManager({ accessToken, assets, onRefresh }: AssetManagerPro
                             <TrendingDown className="h-4 w-4" />
                           )}
                           <span className="text-sm font-medium">
-                            {gain >= 0 ? '+' : ''}${Math.abs(gain).toLocaleString()} ({gain >= 0 ? '+' : ''}{gainPercent}%)
+                            {gain >= 0 ? '+' : ''}{formatCurrency(Math.abs(gain))} ({gain >= 0 ? '+' : ''}{gainPercent}%)
                           </span>
                         </div>
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-right">
                           <p className="text-xs text-gray-500 mb-1">Current Value</p>
-                          <p className="font-bold text-xl">${asset.currentValue.toLocaleString()}</p>
+                          <p className="font-bold text-xl">{formatCurrency(asset.currentValue)}</p>
                         </div>
                         <div className="flex gap-2">
                           <Button

@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Progress } from './ui/progress';
 import { Plus, AlertCircle, CheckCircle, AlertTriangle } from 'lucide-react';
 import { API_BASE_URL } from '../../api-config';
+import { formatCurrency } from '../../lib/currency-config';
 
 interface Expense {
   id: string;
@@ -255,15 +256,15 @@ export function BudgetManager({ accessToken, expenses }: BudgetManagerProps) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="p-4 bg-blue-50 rounded-lg">
               <p className="text-sm text-gray-600 mb-1">Total Budget</p>
-              <p className="text-2xl font-bold text-blue-600">${totalBudget.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-blue-600">{formatCurrency(totalBudget)}</p>
             </div>
             <div className="p-4 bg-red-50 rounded-lg">
               <p className="text-sm text-gray-600 mb-1">Total Spent</p>
-              <p className="text-2xl font-bold text-red-600">${totalSpent.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-red-600">{formatCurrency(totalSpent)}</p>
             </div>
             <div className="p-4 bg-green-50 rounded-lg">
               <p className="text-sm text-gray-600 mb-1">Remaining</p>
-              <p className="text-2xl font-bold text-green-600">${totalRemaining.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-green-600">{formatCurrency(totalRemaining)}</p>
             </div>
           </div>
 
@@ -294,8 +295,7 @@ export function BudgetManager({ accessToken, expenses }: BudgetManagerProps) {
                       )}
                     </div>
                     <div className="text-right">
-                      <p className="text-sm text-gray-600">
-                        ${item.spent.toLocaleString()} / ${item.budget.toLocaleString()}
+                      <p className="text-sm text-gray-600">{formatCurrency(item.spent)} / {formatCurrency(item.budget)}
                       </p>
                       <p className={`text-xs ${
                         item.status === 'danger' ? 'text-red-600' :
@@ -321,7 +321,7 @@ export function BudgetManager({ accessToken, expenses }: BudgetManagerProps) {
                     <span className={`font-medium ${
                       item.remaining > 0 ? 'text-green-600' : 'text-red-600'
                     }`}>
-                      ${item.remaining.toLocaleString()}
+                      {formatCurrency(item.remaining)}
                     </span>
                   </div>
 

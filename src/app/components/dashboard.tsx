@@ -8,6 +8,9 @@ import { AssetManager } from './asset-manager';
 import { BudgetManager } from './budget-manager';
 import { AnalyticsDashboard } from './analytics-dashboard';
 import { BankAccountManager } from './bank-account-manager';
+import { CurrencySettings } from './currency-settings';
+import { useFormatCurrency } from '../hooks/useFormatCurrency';
+import { useCurrency } from '../context/CurrencyContext';
 import { LogOut, TrendingUp, TrendingDown, Wallet, PiggyBank } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import { projectId, publicAnonKey } from '../../../utils/supabase/info';
@@ -53,6 +56,8 @@ export function Dashboard({ accessToken, onLogout }: DashboardProps) {
   const [income, setIncome] = useState<Income[]>([]);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
+  const { selectedCurrency } = useCurrency();
+  const formatCurrency = useFormatCurrency();
 
   useEffect(() => {
     fetchAllData();
@@ -166,7 +171,7 @@ export function Dashboard({ accessToken, onLogout }: DashboardProps) {
               <Wallet className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${netWorth.toLocaleString()}</div>
+              <div className="text-2xl font-bold">{formatCurrency(netWorth)}</div>
               <p className="text-xs text-muted-foreground">Total assets minus expenses</p>
             </CardContent>
           </Card>
@@ -177,7 +182,7 @@ export function Dashboard({ accessToken, onLogout }: DashboardProps) {
               <TrendingUp className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">${totalIncome.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-green-600">{formatCurrency(totalIncome)}</div>
               <p className="text-xs text-muted-foreground">All-time income</p>
             </CardContent>
           </Card>
@@ -188,7 +193,7 @@ export function Dashboard({ accessToken, onLogout }: DashboardProps) {
               <TrendingDown className="h-4 w-4 text-red-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-600">${monthlyExpenses.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-red-600">{formatCurrency(monthlyExpenses)}</div>
               <p className="text-xs text-muted-foreground">This month</p>
             </CardContent>
           </Card>
@@ -199,7 +204,7 @@ export function Dashboard({ accessToken, onLogout }: DashboardProps) {
               <PiggyBank className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">${totalAssets.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-blue-600">{formatCurrency(totalAssets)}</div>
               <p className="text-xs text-muted-foreground">{assets.length} assets</p>
             </CardContent>
           </Card>
@@ -207,7 +212,7 @@ export function Dashboard({ accessToken, onLogout }: DashboardProps) {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7">
+          <TabsList className="grid w-full grid-cols-8">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="income">Income</TabsTrigger>
             <TabsTrigger value="expenses">Expenses</TabsTrigger>
@@ -215,6 +220,7 @@ export function Dashboard({ accessToken, onLogout }: DashboardProps) {
             <TabsTrigger value="bank">Bank Accounts</TabsTrigger>
             <TabsTrigger value="budget">Budget</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard" className="space-y-6">
@@ -268,6 +274,10 @@ export function Dashboard({ accessToken, onLogout }: DashboardProps) {
               income={income} 
               assets={assets} 
             />
+          </TabsContent>
+
+          <TabsContent value="settings">
+            <CurrencySettings />
           </TabsContent>
         </Tabs>
       </main>

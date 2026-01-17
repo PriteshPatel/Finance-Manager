@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Plus, Pencil, Trash2, CreditCard, Building2, Wallet } from 'lucide-react';
 import { API_BASE_URL } from '../../api-config';
+import { formatCurrency } from '../../lib/currency-config';
 
 interface BankAccount {
   id: string;
@@ -192,7 +193,7 @@ export function BankAccountManager({ accessToken }: BankAccountManagerProps) {
             </div>
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">Total Balance</p>
-              <p className="text-2xl font-bold text-green-600">${totalBalance.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-green-600">{formatCurrency(totalBalance)}</p>
             </div>
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">Active Accounts</p>

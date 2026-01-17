@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Plus, Pencil, Trash2, Search } from 'lucide-react';
 import { API_BASE_URL } from '../../api-config';
+import { formatCurrency } from '../../lib/currency-config';
 
 interface Expense {
   id: string;
@@ -309,7 +310,7 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
           {/* Summary */}
           <div className="mb-4 p-4 bg-blue-50 rounded-lg">
             <p className="text-sm text-gray-600">Total Expenses</p>
-            <p className="text-2xl font-bold text-blue-600">${totalAmount.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-blue-600">{formatCurrency(totalAmount)}</p>
             <p className="text-xs text-gray-500">{filteredExpenses.length} transactions</p>
           </div>
 
@@ -353,7 +354,7 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="text-right">
-                        <p className="font-bold text-lg">${expense.amount.toLocaleString()}</p>
+                        <p className="font-bold text-lg">{formatCurrency(expense.amount)}</p>
                       </div>
                       <div className="flex gap-2">
                         <Button
