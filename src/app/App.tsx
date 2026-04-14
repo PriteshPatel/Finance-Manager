@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AuthPage } from './components/auth-page';
 import { Dashboard } from './components/dashboard';
-import { CurrencyProvider } from './context/CurrencyContext';
 
 export default function App() {
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -41,9 +40,5 @@ export default function App() {
     return <AuthPage onAuthSuccess={handleAuthSuccess} />;
   }
 
-  return (
-    <CurrencyProvider>
-      <Dashboard accessToken={accessToken} onLogout={handleLogout} />
-    </CurrencyProvider>
-  );
+  return <Dashboard accessToken={accessToken} onLogout={handleLogout} />;
 }

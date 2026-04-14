@@ -6,6 +6,7 @@ import { Label } from './ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Plus, Pencil, Trash2, TrendingUp, IndianRupee  } from 'lucide-react';
+import { useTranslation } from '../hooks/useTranslation';
 import { API_BASE_URL } from '../../api-config';
 import { formatCurrency } from '../../lib/currency-config';
 
@@ -41,6 +42,7 @@ const INCOME_SOURCES = [
 export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingIncome, setEditingIncome] = useState<Income | null>(null);
+  const t = useTranslation();
   const [formData, setFormData] = useState({
     amount: '',
     source: '',
@@ -158,34 +160,34 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Income</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('totalIncome')}</CardTitle>
             <IndianRupee className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">{formatCurrency(totalIncome)}</div>
-            <p className="text-xs text-muted-foreground">All-time total</p>
+            <p className="text-xs text-muted-foreground">{t('allTimeIncome')}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">This Month</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('thisMonth')}</CardTitle>
             <TrendingUp className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">{formatCurrency(currentMonthIncome)}</div>
-            <p className="text-xs text-muted-foreground">Current month income</p>
+            <p className="text-xs text-muted-foreground">{t('thisMonth')}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Income Records</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('income')}</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{filteredIncome.length}</div>
-            <p className="text-xs text-muted-foreground">Total entries</p>
+            <p className="text-xs text-muted-foreground">{t('totalLanguages')}</p>
           </CardContent>
         </Card>
       </div>
@@ -195,8 +197,8 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Income Records</CardTitle>
-              <CardDescription>Track all your income sources</CardDescription>
+              <CardTitle>{t('income')}</CardTitle>
+              <CardDescription>{t('manageYourFinances')}</CardDescription>
             </div>
             <Dialog open={isDialogOpen} onOpenChange={(open) => {
               setIsDialogOpen(open);
@@ -205,20 +207,20 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="mr-2 h-4 w-4" />
-                  Add Income
+                  {t('addNewIncome')}
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>{editingIncome ? 'Edit Income' : 'Add New Income'}</DialogTitle>
+                  <DialogTitle>{editingIncome ? t('edit') : t('addNewIncome')}</DialogTitle>
                   <DialogDescription>
-                    {editingIncome ? 'Update the income record' : 'Enter details of your new income'}
+                    {editingIncome ? t('edit') : t('addNewIncome')}
                   </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit}>
                   <div className="grid gap-4 py-4">
                     <div className="space-y-2">
-                      <Label htmlFor="amount">Amount</Label>
+                      <Label htmlFor="amount">{t('amount')}</Label>
                       <Input
                         id="amount"
                         type="number"
@@ -230,14 +232,14 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="source">Source</Label>
+                      <Label htmlFor="source">{t('incomeSource')}</Label>
                       <Select
                         value={formData.source}
                         onValueChange={(value) => setFormData({ ...formData, source: value })}
                         required
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Select source" />
+                          <SelectValue placeholder={t('incomeSource')} />
                         </SelectTrigger>
                         <SelectContent>
                           {INCOME_SOURCES.map((source) => (
@@ -249,7 +251,7 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="date">Date</Label>
+                      <Label htmlFor="date">{t('date')}</Label>
                       <Input
                         id="date"
                         type="date"
@@ -259,10 +261,10 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="description">Description (Optional)</Label>
+                      <Label htmlFor="description">{t('description')}</Label>
                       <Input
                         id="description"
-                        placeholder="Add notes..."
+                        placeholder={t('description')}
                         value={formData.description}
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       />

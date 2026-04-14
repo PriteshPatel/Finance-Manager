@@ -10,6 +10,7 @@ import { AnalyticsDashboard } from './analytics-dashboard';
 import { BankAccountManager } from './bank-account-manager';
 import { CurrencySettings } from './currency-settings';
 import { useFormatCurrency } from '../hooks/useFormatCurrency';
+import { useTranslation } from '../hooks/useTranslation';
 import { useCurrency } from '../context/CurrencyContext';
 import { LogOut, TrendingUp, TrendingDown, Wallet, PiggyBank } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
@@ -58,6 +59,7 @@ export function Dashboard({ accessToken, onLogout }: DashboardProps) {
   const [loading, setLoading] = useState(true);
   const { selectedCurrency } = useCurrency();
   const formatCurrency = useFormatCurrency();
+  const t = useTranslation();
 
   useEffect(() => {
     fetchAllData();
@@ -151,12 +153,12 @@ export function Dashboard({ accessToken, onLogout }: DashboardProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Finance Manager</h1>
-              <p className="text-sm text-gray-600">Manage your finances with ease</p>
+              <h1 className="text-2xl font-bold text-gray-900">{t('financeManager')}</h1>
+              <p className="text-sm text-gray-600">{t('manageYourFinances')}</p>
             </div>
             <Button onClick={handleLogout} variant="outline">
               <LogOut className="mr-2 h-4 w-4" />
-              Logout
+              {t('logout')}
             </Button>
           </div>
         </div>
@@ -167,7 +169,7 @@ export function Dashboard({ accessToken, onLogout }: DashboardProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Net Worth</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('netWorth')}</CardTitle>
               <Wallet className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -178,34 +180,34 @@ export function Dashboard({ accessToken, onLogout }: DashboardProps) {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Income</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('totalIncome')}</CardTitle>
               <TrendingUp className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">{formatCurrency(totalIncome)}</div>
-              <p className="text-xs text-muted-foreground">All-time income</p>
+              <p className="text-xs text-muted-foreground">{t('allTimeIncome')}</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Monthly Expenses</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('monthlyExpenses')}</CardTitle>
               <TrendingDown className="h-4 w-4 text-red-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-red-600">{formatCurrency(monthlyExpenses)}</div>
-              <p className="text-xs text-muted-foreground">This month</p>
+              <p className="text-xs text-muted-foreground">{t('thisMonth')}</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Assets</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('totalAssets')}</CardTitle>
               <PiggyBank className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-blue-600">{formatCurrency(totalAssets)}</div>
-              <p className="text-xs text-muted-foreground">{assets.length} assets</p>
+              <p className="text-xs text-muted-foreground">{t('totalAssetsLabel').replace('{count}', assets.length.toString())}</p>
             </CardContent>
           </Card>
         </div>
@@ -213,14 +215,14 @@ export function Dashboard({ accessToken, onLogout }: DashboardProps) {
         {/* Main Content Tabs */}
         <Tabs defaultValue="dashboard" className="space-y-6">
           <TabsList className="grid w-full grid-cols-8">
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="income">Income</TabsTrigger>
-            <TabsTrigger value="expenses">Expenses</TabsTrigger>
-            <TabsTrigger value="assets">Assets</TabsTrigger>
-            <TabsTrigger value="bank">Bank Accounts</TabsTrigger>
-            <TabsTrigger value="budget">Budget</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
+            <TabsTrigger value="dashboard">{t('dashboard')}</TabsTrigger>
+            <TabsTrigger value="income">{t('income')}</TabsTrigger>
+            <TabsTrigger value="expenses">{t('expenses')}</TabsTrigger>
+            <TabsTrigger value="assets">{t('assets')}</TabsTrigger>
+            <TabsTrigger value="bank">{t('bankAccounts')}</TabsTrigger>
+            <TabsTrigger value="budget">{t('budget')}</TabsTrigger>
+            <TabsTrigger value="analytics">{t('analytics')}</TabsTrigger>
+            <TabsTrigger value="settings">{t('settings')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard" className="space-y-6">

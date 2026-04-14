@@ -6,6 +6,7 @@ import { Label } from './ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Progress } from './ui/progress';
+import { useTranslation } from '../hooks/useTranslation';
 import { Plus, AlertCircle, CheckCircle, AlertTriangle } from 'lucide-react';
 import { API_BASE_URL } from '../../api-config';
 import { formatCurrency } from '../../lib/currency-config';
@@ -45,6 +46,7 @@ const EXPENSE_CATEGORIES = [
 export function BudgetManager({ accessToken, expenses }: BudgetManagerProps) {
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const t = useTranslation();
   const [formData, setFormData] = useState({
     category: '',
     amount: '',
@@ -171,12 +173,12 @@ export function BudgetManager({ accessToken, expenses }: BudgetManagerProps) {
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
-              <CardTitle>Budget Management</CardTitle>
-              <CardDescription>Set and track your monthly budgets</CardDescription>
+              <CardTitle>{t('budget')}</CardTitle>
+              <CardDescription>{t('manageYourFinances')}</CardDescription>
             </div>
             <div className="flex gap-4 items-center">
               <div className="w-48">
-                <Label htmlFor="month-select" className="text-sm mb-2 block">Select Month</Label>
+                <Label htmlFor="month-select" className="text-sm mb-2 block">{t('selectMonth')}</Label>
                 <Input
                   id="month-select"
                   type="month"

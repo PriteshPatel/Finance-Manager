@@ -6,6 +6,7 @@ import { Label } from './ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Plus, Pencil, Trash2, Search } from 'lucide-react';
+import { useTranslation } from '../hooks/useTranslation';
 import { API_BASE_URL } from '../../api-config';
 import { formatCurrency } from '../../lib/currency-config';
 
@@ -41,6 +42,7 @@ const EXPENSE_CATEGORIES = [
 export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseManagerProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const t = useTranslation();
   const [formData, setFormData] = useState({
     amount: '',
     category: '',
@@ -171,26 +173,26 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
-              <CardTitle>Expense Management</CardTitle>
-              <CardDescription>Track and manage your expenses</CardDescription>
+              <CardTitle>{t('expenses')}</CardTitle>
+              <CardDescription>{t('manageYourFinances')}</CardDescription>
             </div>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button onClick={resetForm}>
                   <Plus className="mr-2 h-4 w-4" />
-                  Add Expense
+                  {t('addNewExpense')}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-md">
                 <DialogHeader>
-                  <DialogTitle>{editingExpense ? 'Edit Expense' : 'Add New Expense'}</DialogTitle>
+                  <DialogTitle>{editingExpense ? t('edit') : t('addNewExpense')}</DialogTitle>
                   <DialogDescription>
-                    {editingExpense ? 'Update expense details' : 'Enter the details of your expense'}
+                    {editingExpense ? t('edit') : t('addNewExpense')}
                   </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="amount">Amount</Label>
+                    <Label htmlFor="amount">{t('amount')}</Label>
                     <Input
                       id="amount"
                       type="number"
@@ -203,10 +205,10 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="category">Category</Label>
+                    <Label htmlFor="category">{t('expenseCategory')}</Label>
                     <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a category" />
+                        <SelectValue placeholder={t('expenseCategory')} />
                       </SelectTrigger>
                       <SelectContent>
                         {EXPENSE_CATEGORIES.map((cat) => (
@@ -219,10 +221,10 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
+                    <Label htmlFor="description">{t('description')}</Label>
                     <Input
                       id="description"
-                      placeholder="What was this expense for?"
+                      placeholder={t('description')}
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       required

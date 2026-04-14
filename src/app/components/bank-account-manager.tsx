@@ -6,6 +6,7 @@ import { Label } from './ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Plus, Pencil, Trash2, CreditCard, Building2, Wallet } from 'lucide-react';
+import { useTranslation } from '../hooks/useTranslation';
 import { API_BASE_URL } from '../../api-config';
 import { formatCurrency } from '../../lib/currency-config';
 
@@ -39,8 +40,7 @@ const CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'INR'];
 export function BankAccountManager({ accessToken }: BankAccountManagerProps) {
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingAccount, setEditingAccount] = useState<BankAccount | null>(null);
-  const [formData, setFormData] = useState({
+  const [editingAccount, setEditingAccount] = useState<BankAccount | null>(null);  const t = useTranslation();  const [formData, setFormData] = useState({
     accountName: '',
     bankName: '',
     accountNumber: '',
@@ -182,21 +182,21 @@ export function BankAccountManager({ accessToken }: BankAccountManagerProps) {
       {/* Summary Card */}
       <Card>
         <CardHeader>
-          <CardTitle>Bank Accounts Summary</CardTitle>
-          <CardDescription>Overview of all your bank accounts</CardDescription>
+          <CardTitle>{t('bankAccounts')}</CardTitle>
+          <CardDescription>{t('manageYourFinances')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">Total Accounts</p>
+              <p className="text-sm text-muted-foreground">{t('bankAccounts')}</p>
               <p className="text-2xl font-bold">{bankAccounts.length}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">Total Balance</p>
+              <p className="text-sm text-muted-foreground">{t('totalAssets')}</p>
               <p className="text-2xl font-bold text-green-600">{formatCurrency(totalBalance)}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">Active Accounts</p>
+              <p className="text-sm text-muted-foreground">{t('bankAccounts')}</p>
               <p className="text-2xl font-bold">{bankAccounts.filter(a => a.balance > 0).length}</p>
             </div>
           </div>
@@ -208,8 +208,8 @@ export function BankAccountManager({ accessToken }: BankAccountManagerProps) {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Bank Accounts</CardTitle>
-              <CardDescription>Manage your bank accounts and balances</CardDescription>
+              <CardTitle>{t('bankAccounts')}</CardTitle>
+              <CardDescription>{t('manageYourFinances')}</CardDescription>
             </div>
             <Dialog open={isDialogOpen} onOpenChange={(open) => {
               setIsDialogOpen(open);
@@ -218,7 +218,7 @@ export function BankAccountManager({ accessToken }: BankAccountManagerProps) {
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="mr-2 h-4 w-4" />
-                  Add Account
+                  {t('addNewIncome')}
                 </Button>
               </DialogTrigger>
               <DialogContent>

@@ -7,7 +7,8 @@ const jwt = require('jsonwebtoken');
 const { MongoClient, ObjectId } = require('mongodb');
 
 const app = express();
-const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 4002;
+const parsedPort = Number.parseInt(process.env.PORT, 10);
+const DEFAULT_PORT = Number.isFinite(parsedPort) ? parsedPort : 5001;
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-production';
 
 // MongoDB connection

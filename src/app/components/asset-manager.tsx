@@ -4,8 +4,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Plus, Pencil, Trash2, TrendingUp, TrendingDown } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';import { useTranslation } from '../hooks/useTranslation';import { Plus, Pencil, Trash2, TrendingUp, TrendingDown } from 'lucide-react';
 import { API_BASE_URL } from '../../api-config';
 import { formatCurrency } from '../../lib/currency-config';
 
@@ -41,6 +40,7 @@ const ASSET_TYPES = [
 export function AssetManager({ accessToken, assets, onRefresh }: AssetManagerProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingAsset, setEditingAsset] = useState<Asset | null>(null);
+  const t = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
     type: '',
@@ -158,29 +158,29 @@ export function AssetManager({ accessToken, assets, onRefresh }: AssetManagerPro
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
-              <CardTitle>Asset Management</CardTitle>
-              <CardDescription>Track and monitor your asset portfolio</CardDescription>
+              <CardTitle>{t('assets')}</CardTitle>
+              <CardDescription>{t('manageYourFinances')}</CardDescription>
             </div>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button onClick={resetForm}>
                   <Plus className="mr-2 h-4 w-4" />
-                  Add Asset
+                  {t('addNewAsset')}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-md">
                 <DialogHeader>
-                  <DialogTitle>{editingAsset ? 'Edit Asset' : 'Add New Asset'}</DialogTitle>
+                  <DialogTitle>{editingAsset ? t('edit') : t('addNewAsset')}</DialogTitle>
                   <DialogDescription>
-                    {editingAsset ? 'Update asset details' : 'Enter the details of your asset'}
+                    {editingAsset ? t('edit') : t('addNewAsset')}
                   </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Asset Name</Label>
+                    <Label htmlFor="name">{t('assetName')}</Label>
                     <Input
                       id="name"
-                      placeholder="e.g., Apple Stock, House, Gold"
+                      placeholder={t('assetName')}
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       required
@@ -188,10 +188,10 @@ export function AssetManager({ accessToken, assets, onRefresh }: AssetManagerPro
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="type">Asset Type</Label>
+                    <Label htmlFor="type">{t('assetType')}</Label>
                     <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value })}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select asset type" />
+                        <SelectValue placeholder={t('assetType')} />
                       </SelectTrigger>
                       <SelectContent>
                         {ASSET_TYPES.map((type) => (

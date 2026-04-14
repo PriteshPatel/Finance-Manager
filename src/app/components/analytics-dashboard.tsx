@@ -1,4 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { useTranslation } from '../hooks/useTranslation';
 import {
   PieChart,
   Pie,
@@ -48,6 +49,7 @@ interface AnalyticsDashboardProps {
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82ca9d', '#ffc658', '#ff7c7c'];
 
 export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashboardProps) {
+  const t = useTranslation();
   // Calculate expense by category
   const expensesByCategory = expenses.reduce((acc, expense) => {
     const existing = acc.find(item => item.name === expense.category);
@@ -114,8 +116,8 @@ export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashbo
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Expenses by Category</CardTitle>
-            <CardDescription>Distribution of your spending</CardDescription>
+            <CardTitle>{t('expenses')}</CardTitle>
+            <CardDescription>{t('manageYourFinances')}</CardDescription>
           </CardHeader>
           <CardContent>
             {expensesByCategory.length > 0 ? (
@@ -148,8 +150,8 @@ export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashbo
 
         <Card>
           <CardHeader>
-            <CardTitle>Asset Distribution</CardTitle>
-            <CardDescription>Your portfolio allocation</CardDescription>
+            <CardTitle>{t('assetDistribution')}</CardTitle>
+            <CardDescription>{t('portfolioAllocation')}</CardDescription>
           </CardHeader>
           <CardContent>
             {assetsByType.length > 0 ? (
@@ -184,8 +186,8 @@ export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashbo
       {/* Charts Row 2 */}
       <Card>
         <CardHeader>
-          <CardTitle>Income vs Expenses</CardTitle>
-          <CardDescription>6-month trend comparison</CardDescription>
+          <CardTitle>{t('incomeVsExpenses')}</CardTitle>
+          <CardDescription>{t('sixMonthTrend')}</CardDescription>
         </CardHeader>
         <CardContent>
           {monthlyData.some(d => d.expenses > 0 || d.income > 0) ? (
@@ -211,8 +213,8 @@ export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashbo
       {/* Top Categories */}
       <Card>
         <CardHeader>
-          <CardTitle>Top Spending Categories</CardTitle>
-          <CardDescription>Your highest expense categories</CardDescription>
+          <CardTitle>{t('topSpendingCategories')}</CardTitle>
+          <CardDescription>{t('highestExpenseCategories')}</CardDescription>
         </CardHeader>
         <CardContent>
           {topCategories.length > 0 ? (
@@ -237,8 +239,8 @@ export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashbo
       {assetPerformance.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Asset Performance</CardTitle>
-            <CardDescription>Gains and losses on your assets</CardDescription>
+            <CardTitle>{t('assetPerformance')}</CardTitle>
+            <CardDescription>{t('gainsAndLosses')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">

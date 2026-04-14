@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { useTranslation } from '../hooks/useTranslation';
 import { API_BASE_URL } from '../../api-config';
 
 interface AuthPageProps {
@@ -18,6 +19,7 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
   const [signupPassword, setSignupPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const t = useTranslation();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,37 +94,37 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl text-center">Finance Manager</CardTitle>
+          <CardTitle className="text-2xl text-center">{t('financeManager')}</CardTitle>
           <CardDescription className="text-center">
-            Track your expenses and manage your assets
+            {t('manageYourFinances')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="login" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsTrigger value="login">{t('login')}</TabsTrigger>
+              <TabsTrigger value="signup">{t('signup')}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="login">
               <form onSubmit={handleLogin} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="login-email">Email</Label>
+                  <Label htmlFor="login-email">{t('email')}</Label>
                   <Input
                     id="login-email"
                     type="email"
-                    placeholder="Enter your email"
+                    placeholder={t('email')}
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="login-password">Password</Label>
+                  <Label htmlFor="login-password">{t('password')}</Label>
                   <Input
                     id="login-password"
                     type="password"
-                    placeholder="Enter your password"
+                    placeholder={t('password')}
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
                     required
@@ -130,7 +132,7 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
                 </div>
                 {error && <p className="text-sm text-red-600">{error}</p>}
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Logging in...' : 'Login'}
+                  {loading ? t('loading') : t('login')}
                 </Button>
               </form>
             </TabsContent>
@@ -138,33 +140,33 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
             <TabsContent value="signup">
               <form onSubmit={handleSignup} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-name">Name</Label>
+                  <Label htmlFor="signup-name">{t('name')}</Label>
                   <Input
                     id="signup-name"
                     type="text"
-                    placeholder="Enter your name"
+                    placeholder={t('name')}
                     value={signupName}
                     onChange={(e) => setSignupName(e.target.value)}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
+                  <Label htmlFor="signup-email">{t('email')}</Label>
                   <Input
                     id="signup-email"
                     type="email"
-                    placeholder="Enter your email"
+                    placeholder={t('email')}
                     value={signupEmail}
                     onChange={(e) => setSignupEmail(e.target.value)}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
+                  <Label htmlFor="signup-password">{t('password')}</Label>
                   <Input
                     id="signup-password"
                     type="password"
-                    placeholder="Create a password"
+                    placeholder={t('password')}
                     value={signupPassword}
                     onChange={(e) => setSignupPassword(e.target.value)}
                     required
@@ -172,7 +174,7 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
                 </div>
                 {error && <p className="text-sm text-red-600">{error}</p>}
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Creating account...' : 'Sign Up'}
+                  {loading ? t('loading') : t('signup')}
                 </Button>
               </form>
             </TabsContent>
