@@ -9,7 +9,7 @@ import { Progress } from './ui/progress';
 import { useTranslation } from '../hooks/useTranslation';
 import { Plus, AlertCircle, CheckCircle, AlertTriangle } from 'lucide-react';
 import { API_BASE_URL } from '../../api-config';
-import { formatCurrency } from '../../lib/currency-config';
+import { useFormatCurrency } from '../hooks/useFormatCurrency';
 
 interface Expense {
   id: string;
@@ -47,6 +47,7 @@ export function BudgetManager({ accessToken, expenses }: BudgetManagerProps) {
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const t = useTranslation();
+  const formatCurrency = useFormatCurrency();
   const [formData, setFormData] = useState({
     category: '',
     amount: '',
@@ -233,8 +234,8 @@ export function BudgetManager({ accessToken, expenses }: BudgetManagerProps) {
                       />
                     </div>
 
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <p className="text-sm text-gray-600">
+                    <div className="p-3 bg-muted/50 border border-border rounded-lg">
+                      <p className="text-sm text-muted-foreground">
                         This budget will be set for: <strong>{new Date(selectedMonth + '-01').toLocaleDateString('default', { month: 'long', year: 'numeric' })}</strong>
                       </p>
                     </div>
@@ -256,17 +257,17 @@ export function BudgetManager({ accessToken, expenses }: BudgetManagerProps) {
         <CardContent>
           {/* Overall Summary */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="p-4 bg-blue-50 rounded-lg">
-              <p className="text-sm text-gray-600 mb-1">Total Budget</p>
-              <p className="text-2xl font-bold text-blue-600">{formatCurrency(totalBudget)}</p>
+            <div className="p-4 bg-primary/10 border border-primary/20 rounded-xl shadow-xs">
+              <p className="text-sm text-muted-foreground mb-1">Total Budget</p>
+              <p className="text-2xl font-bold text-primary">{formatCurrency(totalBudget)}</p>
             </div>
-            <div className="p-4 bg-red-50 rounded-lg">
-              <p className="text-sm text-gray-600 mb-1">Total Spent</p>
-              <p className="text-2xl font-bold text-red-600">{formatCurrency(totalSpent)}</p>
+            <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-xl shadow-xs">
+              <p className="text-sm text-muted-foreground mb-1">Total Spent</p>
+              <p className="text-2xl font-bold text-destructive">{formatCurrency(totalSpent)}</p>
             </div>
-            <div className="p-4 bg-green-50 rounded-lg">
-              <p className="text-sm text-gray-600 mb-1">Remaining</p>
-              <p className="text-2xl font-bold text-green-600">{formatCurrency(totalRemaining)}</p>
+            <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl shadow-xs">
+              <p className="text-sm text-muted-foreground mb-1">Remaining</p>
+              <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{formatCurrency(totalRemaining)}</p>
             </div>
           </div>
 
@@ -281,7 +282,7 @@ export function BudgetManager({ accessToken, expenses }: BudgetManagerProps) {
               budgetStatus.map((item) => (
                 <div
                   key={item.category}
-                  className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+                  className="p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors"
                 >
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex items-center gap-2">

@@ -7,8 +7,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Plus, Pencil, Trash2, Search } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
+import { useFormatCurrency } from '../hooks/useFormatCurrency';
 import { API_BASE_URL } from '../../api-config';
-import { formatCurrency } from '../../lib/currency-config';
 
 interface Expense {
   id: string;
@@ -43,6 +43,7 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const t = useTranslation();
+  const formatCurrency = useFormatCurrency();
   const [formData, setFormData] = useState({
     amount: '',
     category: '',
@@ -310,16 +311,16 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
           </div>
 
           {/* Summary */}
-          <div className="mb-4 p-4 bg-blue-50 rounded-lg">
-            <p className="text-sm text-gray-600">Total Expenses</p>
-            <p className="text-2xl font-bold text-blue-600">{formatCurrency(totalAmount)}</p>
-            <p className="text-xs text-gray-500">{filteredExpenses.length} transactions</p>
+          <div className="mb-4 p-4 bg-primary/10 border border-primary/20 rounded-xl shadow-xs">
+            <p className="text-sm text-muted-foreground">Total Expenses</p>
+            <p className="text-2xl font-bold text-primary">{formatCurrency(totalAmount)}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{filteredExpenses.length} transactions</p>
           </div>
 
           {/* Expense List */}
           <div className="space-y-4">
             {filteredExpenses.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
+              <div className="text-center py-12 text-muted-foreground">
                 <p>No expenses found</p>
                 <p className="text-sm">Add your first expense to get started</p>
               </div>
@@ -329,25 +330,25 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
                 .map((expense) => (
                   <div
                     key={expense.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors"
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <h4 className="font-semibold">{expense.description}</h4>
                         {expense.recurring && (
-                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
+                          <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
                             Recurring
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-gray-600">{expense.category}</p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-sm text-muted-foreground">{expense.category}</p>
+                      <p className="text-xs text-muted-foreground">
                         {new Date(expense.date).toLocaleDateString()}
                       </p>
                       {expense.tags && expense.tags.length > 0 && (
                         <div className="flex gap-1 mt-1">
                           {expense.tags.map((tag, index) => (
-                            <span key={index} className="text-xs bg-gray-100 px-2 py-0.5 rounded">
+                            <span key={index} className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded">
                               {tag}
                             </span>
                           ))}

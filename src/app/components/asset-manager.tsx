@@ -6,7 +6,7 @@ import { Label } from './ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';import { useTranslation } from '../hooks/useTranslation';import { Plus, Pencil, Trash2, TrendingUp, TrendingDown } from 'lucide-react';
 import { API_BASE_URL } from '../../api-config';
-import { formatCurrency } from '../../lib/currency-config';
+import { useFormatCurrency } from '../hooks/useFormatCurrency';
 
 interface Asset {
   id: string;
@@ -41,6 +41,7 @@ export function AssetManager({ accessToken, assets, onRefresh }: AssetManagerPro
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingAsset, setEditingAsset] = useState<Asset | null>(null);
   const t = useTranslation();
+  const formatCurrency = useFormatCurrency();
   const [formData, setFormData] = useState({
     name: '',
     type: '',
@@ -268,27 +269,27 @@ export function AssetManager({ accessToken, assets, onRefresh }: AssetManagerPro
         <CardContent>
           {/* Portfolio Summary */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="p-4 bg-blue-50 rounded-lg">
-              <p className="text-sm text-gray-600 mb-1">Total Value</p>
-              <p className="text-2xl font-bold text-blue-600">{formatCurrency(totalValue)}</p>
+            <div className="p-4 bg-primary/10 border border-primary/20 rounded-xl shadow-xs">
+              <p className="text-sm text-muted-foreground mb-1">Total Value</p>
+              <p className="text-2xl font-bold text-primary">{formatCurrency(totalValue)}</p>
             </div>
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <p className="text-sm text-gray-600 mb-1">Total Invested</p>
-              <p className="text-2xl font-bold text-gray-700">{formatCurrency(totalInvested)}</p>
+            <div className="p-4 bg-muted/50 border border-border rounded-lg">
+              <p className="text-sm text-muted-foreground mb-1">Total Invested</p>
+              <p className="text-2xl font-bold text-foreground">{formatCurrency(totalInvested)}</p>
             </div>
-            <div className={`p-4 rounded-lg ${totalGain >= 0 ? 'bg-green-50' : 'bg-red-50'}`}>
-              <p className="text-sm text-gray-600 mb-1">Total Gain/Loss</p>
+            <div className={`p-4 rounded-xl border shadow-xs ${totalGain >= 0 ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-destructive/10 border-destructive/20'}`}>
+              <p className="text-sm text-muted-foreground mb-1">Total Gain/Loss</p>
               <div className="flex items-center gap-2">
-                <p className={`text-2xl font-bold ${totalGain >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                <p className={`text-2xl font-bold ${totalGain >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'}`}>
                   {formatCurrency(Math.abs(totalGain))}
                 </p>
                 {totalGain >= 0 ? (
-                  <TrendingUp className="h-5 w-5 text-green-600" />
+                  <TrendingUp className="h-5 w-5 text-emerald-500" />
                 ) : (
-                  <TrendingDown className="h-5 w-5 text-red-600" />
+                  <TrendingDown className="h-5 w-5 text-destructive" />
                 )}
               </div>
-              <p className={`text-xs ${totalGain >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              <p className={`text-xs ${totalGain >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'}`}>
                 {totalGain >= 0 ? '+' : ''}{gainPercentage}%
               </p>
             </div>
@@ -311,17 +312,17 @@ export function AssetManager({ accessToken, assets, onRefresh }: AssetManagerPro
                   return (
                     <div
                       key={asset.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+                      className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors"
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <h4 className="font-semibold text-lg">{asset.name}</h4>
-                          <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded">
+                          <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded">
                             {asset.type}
                           </span>
                         </div>
                         {asset.description && (
-                          <p className="text-sm text-gray-600 mt-1">{asset.description}</p>
+                          <p className="text-sm text-muted-foreground mt-1">{asset.description}</p>
                         )}
                         <div className="flex gap-4 mt-2 text-sm text-gray-600">
                           <div>

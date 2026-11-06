@@ -113,16 +113,16 @@ export function CurrencyCard({
       onClick={onClick}
       className={`p-4 rounded-lg border-2 cursor-pointer transition-all hover:shadow-lg ${
         isSelected
-          ? `border-blue-500 ${currency.color} bg-white`
-          : 'border-gray-200 hover:border-gray-300 bg-white'
+          ? 'border-primary ring-2 ring-primary/20 shadow-xs bg-card text-card-foreground'
+          : 'border-border hover:border-primary/40 bg-card text-card-foreground'
       }`}
     >
       <div className="text-4xl mb-2">{currency.flag}</div>
       <h3 className="font-bold text-lg">{currency.code}</h3>
-      <p className="text-sm text-gray-600">{currency.name}</p>
+      <p className="text-sm text-muted-foreground">{currency.name}</p>
       <div className="mt-2 flex items-center gap-2">
         <span className="text-2xl font-bold">{currency.symbol}</span>
-        {isSelected && <span className="text-xs bg-blue-500 text-white px-2 py-1 rounded">Active</span>}
+        {isSelected && <span className="text-xs bg-primary text-primary-foreground font-semibold px-2 py-0.5 rounded-full">Active</span>}
       </div>
     </div>
   );
@@ -136,13 +136,13 @@ export function CurrencyInfo() {
   const currency = getCurrencyDetails(selectedCurrency || getCurrentCurrencyCode());
 
   return (
-    <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-4 rounded-lg border border-gray-200">
+    <div className="bg-card p-4 rounded-xl border border-border shadow-xs">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="text-4xl">{currency.flag}</span>
           <div>
             <h3 className="font-bold text-lg">{currency.name}</h3>
-            <p className="text-sm text-gray-600">{currency.code}</p>
+            <p className="text-sm text-muted-foreground">{currency.code}</p>
           </div>
         </div>
         <div className={`${currency.color} px-4 py-2 rounded-lg font-bold text-lg`}>

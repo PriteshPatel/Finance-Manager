@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Plus, Pencil, Trash2, TrendingUp, IndianRupee  } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
 import { API_BASE_URL } from '../../api-config';
-import { formatCurrency } from '../../lib/currency-config';
+import { useFormatCurrency } from '../hooks/useFormatCurrency';
 
 interface Income {
   id: string;
@@ -43,6 +43,7 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingIncome, setEditingIncome] = useState<Income | null>(null);
   const t = useTranslation();
+  const formatCurrency = useFormatCurrency();
   const [formData, setFormData] = useState({
     amount: '',
     source: '',
@@ -294,6 +295,14 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
+            {/* Summary */}
+            <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl shadow-xs">
+              <p className="text-sm text-muted-foreground">{t('totalIncome')}</p>
+              <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                {formatCurrency(filteredIncome.reduce((sum, item) => sum + item.amount, 0))}
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">{filteredIncome.length} entries</p>
+            </div>
             {/* Filter */}
             <div className="flex items-center gap-4">
               <Select value={filterSource} onValueChange={setFilterSource}>
@@ -315,20 +324,20 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
             {filteredIncome.length === 0 ? (
               <div className="text-center py-12">
                 <TrendingUp className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-sm font-semibold text-gray-900">No income records</h3>
-                <p className="mt-1 text-sm text-gray-500">Get started by adding your first income entry.</p>
+                <h3 className="mt-2 text-sm font-semibold text-foreground">No income records</h3>
+                <p className="mt-1 text-sm text-muted-foreground">Get started by adding your first income entry.</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {filteredIncome
                   .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
                   .map((item) => (
-                    <div key={item.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+                    <div key={item.id} className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50">
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <h4 className="font-semibold">{item.source}</h4>
                           {item.recurring && (
-                            <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
+                            <span className="px-2 py-0.5 text-xs bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-medium rounded">
                               Recurring
                             </span>
                           )}
@@ -342,7 +351,7 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="text-right mr-4">
-                          <p className="text-xl font-bold text-green-600">
+                          <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
                             {formatCurrency(item.amount)}
                           </p>
                         </div>

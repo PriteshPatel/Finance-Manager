@@ -1,81 +1,312 @@
 @custom-variant dark (&:is(.dark *));
 
-:root {
+/* =========================================================================
+ * Bootstrap v6 Alpha Theme Integration
+ * Design tokens reference: https://getbootstrap.com/docs/6.0/customize/color-modes/
+ * ========================================================================= */
+
+/* 1. Default & Bootstrap 6 Light */
+:root,
+[data-bs-theme="light"],
+.theme-bootstrap-light {
+  color-scheme: light;
   --font-size: 16px;
-  --background: #ffffff;
-  --foreground: oklch(0.145 0 0);
+  --background: #f8f9fa;
+  --foreground: #212529;
   --card: #ffffff;
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: #030213;
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.95 0.0058 264.53);
-  --secondary-foreground: #030213;
-  --muted: #ececf0;
-  --muted-foreground: #717182;
-  --accent: #e9ebef;
-  --accent-foreground: #030213;
-  --destructive: #d4183d;
+  --card-foreground: #212529;
+  --popover: #ffffff;
+  --popover-foreground: #212529;
+  --primary: #0d6efd;
+  --primary-foreground: #ffffff;
+  --secondary: #e9ecef;
+  --secondary-foreground: #212529;
+  --muted: #f1f3f5;
+  --muted-foreground: #6c757d;
+  --accent: #e7f1ff;
+  --accent-foreground: #0a58ca;
+  --destructive: #dc3545;
   --destructive-foreground: #ffffff;
-  --border: rgba(0, 0, 0, 0.1);
-  --input: transparent;
-  --input-background: #f3f3f5;
-  --switch-background: #cbced4;
+  --border: #dee2e6;
+  --input: #ced4da;
+  --input-background: #ffffff;
+  --switch-background: #ced4da;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: #030213;
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --ring: #0d6efd;
+  --radius: 0.5rem;
+  --chart-1: #0d6efd;
+  --chart-2: #20c997;
+  --chart-3: #6610f2;
+  --chart-4: #fd7e14;
+  --chart-5: #d63384;
+  --sidebar: #f8f9fa;
+  --sidebar-foreground: #212529;
+  --sidebar-primary: #0d6efd;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e9ecef;
+  --sidebar-accent-foreground: #0d6efd;
+  --sidebar-border: #dee2e6;
+  --sidebar-ring: #0d6efd;
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
+/* 2. Bootstrap 6 Charcoal Dark */
+[data-bs-theme="dark"],
+.dark,
+.theme-bootstrap-dark {
+  color-scheme: dark;
+  --background: #0f1115;
+  --foreground: #f8f9fa;
+  --card: #181b20;
+  --card-foreground: #f8f9fa;
+  --popover: #181b20;
+  --popover-foreground: #f8f9fa;
+  --primary: #3d8bfd;
+  --primary-foreground: #ffffff;
+  --secondary: #212529;
+  --secondary-foreground: #f8f9fa;
+  --muted: #212529;
+  --muted-foreground: #adb5bd;
+  --accent: #1e2837;
+  --accent-foreground: #6ea8fe;
+  --destructive: #ea868f;
+  --destructive-foreground: #000000;
+  --border: #2c313a;
+  --input: #373b3e;
+  --input-background: #181b20;
+  --switch-background: #495057;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  --ring: #3d8bfd;
+  --radius: 0.5rem;
+  --chart-1: #3d8bfd;
+  --chart-2: #4dd4ac;
+  --chart-3: #8540f5;
+  --chart-4: #feb272;
+  --chart-5: #e685b5;
+  --sidebar: #121418;
+  --sidebar-foreground: #f8f9fa;
+  --sidebar-primary: #3d8bfd;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #212529;
+  --sidebar-accent-foreground: #6ea8fe;
+  --sidebar-border: #2c313a;
+  --sidebar-ring: #3d8bfd;
+}
+
+/* 3. Bootstrap 6 Indigo & Violet (Fintech & Trading) */
+[data-bs-theme="indigo"],
+.theme-bootstrap-indigo {
+  color-scheme: dark;
+  --background: #0d0a1a;
+  --foreground: #f5f3ff;
+  --card: #16122b;
+  --card-foreground: #f5f3ff;
+  --popover: #16122b;
+  --popover-foreground: #f5f3ff;
+  --primary: #7952b3;
+  --primary-foreground: #ffffff;
+  --secondary: #241d45;
+  --secondary-foreground: #e0d7fe;
+  --muted: #241d45;
+  --muted-foreground: #a79ad1;
+  --accent: #31255e;
+  --accent-foreground: #d0bfff;
+  --destructive: #ff5c77;
+  --destructive-foreground: #ffffff;
+  --border: #322761;
+  --input: #3c2f74;
+  --input-background: #16122b;
+  --switch-background: #48388b;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: #9065d6;
+  --radius: 0.5rem;
+  --chart-1: #7952b3;
+  --chart-2: #8950fc;
+  --chart-3: #0dcaf0;
+  --chart-4: #f72585;
+  --chart-5: #ffb703;
+  --sidebar: #0f0c22;
+  --sidebar-foreground: #f5f3ff;
+  --sidebar-primary: #7952b3;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #241d45;
+  --sidebar-accent-foreground: #d0bfff;
+  --sidebar-border: #322761;
+  --sidebar-ring: #7952b3;
+}
+
+/* 4. Bootstrap 6 Emerald & Mint (Wealth & Growth) */
+[data-bs-theme="emerald"],
+.theme-bootstrap-emerald {
+  color-scheme: light;
+  --background: #f0fdf4;
+  --foreground: #14532d;
+  --card: #ffffff;
+  --card-foreground: #14532d;
+  --popover: #ffffff;
+  --popover-foreground: #14532d;
+  --primary: #198754;
+  --primary-foreground: #ffffff;
+  --secondary: #dcfce7;
+  --secondary-foreground: #166534;
+  --muted: #e2f9eb;
+  --muted-foreground: #15803d;
+  --accent: #d1e7dd;
+  --accent-foreground: #0f5132;
+  --destructive: #dc3545;
+  --destructive-foreground: #ffffff;
+  --border: #bbf7d0;
+  --input: #86efac;
+  --input-background: #ffffff;
+  --switch-background: #86efac;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: #198754;
+  --radius: 0.5rem;
+  --chart-1: #198754;
+  --chart-2: #20c997;
+  --chart-3: #0dcaf0;
+  --chart-4: #ffc107;
+  --chart-5: #0d6efd;
+  --sidebar: #f0fdf4;
+  --sidebar-foreground: #14532d;
+  --sidebar-primary: #198754;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #dcfce7;
+  --sidebar-accent-foreground: #0f5132;
+  --sidebar-border: #bbf7d0;
+  --sidebar-ring: #198754;
+}
+
+/* 5. Bootstrap 6 Amber Sunset (Executive Gold) */
+[data-bs-theme="amber"],
+.theme-bootstrap-amber {
+  color-scheme: light;
+  --background: #fffbeb;
+  --foreground: #451a03;
+  --card: #ffffff;
+  --card-foreground: #451a03;
+  --popover: #ffffff;
+  --popover-foreground: #451a03;
+  --primary: #d97706;
+  --primary-foreground: #ffffff;
+  --secondary: #fef3c7;
+  --secondary-foreground: #92400e;
+  --muted: #fef3c7;
+  --muted-foreground: #b45309;
+  --accent: #ffeeba;
+  --accent-foreground: #664d03;
+  --destructive: #dc3545;
+  --destructive-foreground: #ffffff;
+  --border: #fde68a;
+  --input: #fcd34d;
+  --input-background: #ffffff;
+  --switch-background: #fcd34d;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: #d97706;
+  --radius: 0.5rem;
+  --chart-1: #d97706;
+  --chart-2: #f59e0b;
+  --chart-3: #fd7e14;
+  --chart-4: #dc3545;
+  --chart-5: #20c997;
+  --sidebar: #fffbeb;
+  --sidebar-foreground: #451a03;
+  --sidebar-primary: #d97706;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #fef3c7;
+  --sidebar-accent-foreground: #92400e;
+  --sidebar-border: #fde68a;
+  --sidebar-ring: #d97706;
+}
+
+/* 6. Bootstrap 6 Cyber Pewter (Cyberpunk Dark) */
+[data-bs-theme="cyber"],
+.theme-bootstrap-cyber {
+  color-scheme: dark;
+  --background: #090c10;
+  --foreground: #e6edf3;
+  --card: #111620;
+  --card-foreground: #e6edf3;
+  --popover: #111620;
+  --popover-foreground: #e6edf3;
+  --primary: #0dcaf0;
+  --primary-foreground: #04141c;
+  --secondary: #1a2230;
+  --secondary-foreground: #79c0ff;
+  --muted: #1a2230;
+  --muted-foreground: #8b949e;
+  --accent: #0f3044;
+  --accent-foreground: #56d4f5;
+  --destructive: #ff4d6d;
+  --destructive-foreground: #ffffff;
+  --border: #243043;
+  --input: #2d3d54;
+  --input-background: #111620;
+  --switch-background: #3b506e;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: #0dcaf0;
+  --radius: 0.5rem;
+  --chart-1: #0dcaf0;
+  --chart-2: #f72585;
+  --chart-3: #7209b7;
+  --chart-4: #4cc9f0;
+  --chart-5: #38b000;
+  --sidebar: #090c10;
+  --sidebar-foreground: #e6edf3;
+  --sidebar-primary: #0dcaf0;
+  --sidebar-primary-foreground: #04141c;
+  --sidebar-accent: #1a2230;
+  --sidebar-accent-foreground: #79c0ff;
+  --sidebar-border: #243043;
+  --sidebar-ring: #0dcaf0;
+}
+
+/* 7. Bootstrap 6 Rose Bloom (Vibrant & Warm) */
+[data-bs-theme="rose"],
+.theme-bootstrap-rose {
+  color-scheme: light;
+  --background: #fff5f7;
+  --foreground: #4c0519;
+  --card: #ffffff;
+  --card-foreground: #4c0519;
+  --popover: #ffffff;
+  --popover-foreground: #4c0519;
+  --primary: #d63384;
+  --primary-foreground: #ffffff;
+  --secondary: #ffe4e6;
+  --secondary-foreground: #9f1239;
+  --muted: #ffe4e6;
+  --muted-foreground: #be123c;
+  --accent: #f8d7da;
+  --accent-foreground: #842029;
+  --destructive: #dc3545;
+  --destructive-foreground: #ffffff;
+  --border: #fecdd3;
+  --input: #fda4af;
+  --input-background: #ffffff;
+  --switch-background: #fda4af;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: #d63384;
+  --radius: 0.5rem;
+  --chart-1: #d63384;
+  --chart-2: #e11d48;
+  --chart-3: #9333ea;
+  --chart-4: #f97316;
+  --chart-5: #06b6d4;
+  --sidebar: #fff5f7;
+  --sidebar-foreground: #4c0519;
+  --sidebar-primary: #d63384;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #ffe4e6;
+  --sidebar-accent-foreground: #9f1239;
+  --sidebar-border: #fecdd3;
+  --sidebar-ring: #d63384;
 }
 
 @theme inline {
@@ -105,10 +336,10 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 6px);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -122,16 +353,15 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
   }
 
   body {
     @apply bg-background text-foreground;
+    min-height: 100vh;
   }
-
-  /**
-  * Default typography styles for HTML elements (h1-h4, p, label, button, input).
-  * These are in @layer base, so Tailwind utility classes (like text-sm, text-lg) automatically override them.
-  */
 
   html {
     font-size: var(--font-size);

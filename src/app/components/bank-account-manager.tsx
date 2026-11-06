@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Plus, Pencil, Trash2, CreditCard, Building2, Wallet } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
 import { API_BASE_URL } from '../../api-config';
-import { formatCurrency } from '../../lib/currency-config';
+import { useFormatCurrency } from '../hooks/useFormatCurrency';
 
 interface BankAccount {
   id: string;
@@ -40,7 +40,10 @@ const CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'INR'];
 export function BankAccountManager({ accessToken }: BankAccountManagerProps) {
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingAccount, setEditingAccount] = useState<BankAccount | null>(null);  const t = useTranslation();  const [formData, setFormData] = useState({
+  const [editingAccount, setEditingAccount] = useState<BankAccount | null>(null);
+  const t = useTranslation();
+  const formatCurrency = useFormatCurrency();
+  const [formData, setFormData] = useState({
     accountName: '',
     bankName: '',
     accountNumber: '',
@@ -324,32 +327,42 @@ export function BankAccountManager({ accessToken }: BankAccountManagerProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
+            {/* Total Balance Summary */}
+            {bankAccounts.length > 0 && (
+              <div className="p-4 bg-primary/10 border border-primary/20 rounded-xl shadow-xs">
+                <p className="text-sm text-muted-foreground">Total Liquid Cash</p>
+                <p className="text-2xl font-bold text-primary">
+                  {formatCurrency(bankAccounts.reduce((sum, a) => sum + a.balance, 0))}
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">{bankAccounts.length} linked accounts</p>
+              </div>
+            )}
             {bankAccounts.length === 0 ? (
               <div className="text-center py-12">
-                <Building2 className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-sm font-semibold text-gray-900">No bank accounts</h3>
-                <p className="mt-1 text-sm text-gray-500">Get started by adding your first bank account.</p>
+                <Building2 className="mx-auto h-12 w-12 text-muted-foreground" />
+                <h3 className="mt-2 text-sm font-semibold text-foreground">No bank accounts</h3>
+                <p className="mt-1 text-sm text-muted-foreground">Get started by adding your first bank account.</p>
               </div>
             ) : (
               bankAccounts.map((account) => (
                 <Card key={account.id}>
                   <CardContent className="pt-6">
-                    <div className="flex items-start justify-between">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                       <div className="flex items-start space-x-4">
-                        <div className="p-2 bg-blue-50 rounded-lg">
+                        <div className="p-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl shadow-xs">
                           {getAccountIcon(account.accountType)}
                         </div>
                         <div>
                           <h4 className="font-semibold">{account.accountName}</h4>
-                          <p className="text-sm text-gray-600">{account.bankName}</p>
-                          <p className="text-xs text-gray-500 mt-1">
+                          <p className="text-sm text-muted-foreground">{account.bankName}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
                             {account.accountType} • {account.accountNumber}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
                         <div className="text-right mr-4">
-                          <p className="text-2xl font-bold text-green-600">
+                          <p className="text-xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400">
                             {account.currency} {account.balance.toLocaleString()}
                           </p>
                         </div>

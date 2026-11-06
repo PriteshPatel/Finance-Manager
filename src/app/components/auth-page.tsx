@@ -4,7 +4,9 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { HeaderThemeSelector } from './ui/theme-selector';
 import { useTranslation } from '../hooks/useTranslation';
+import { Wallet } from 'lucide-react';
 import { API_BASE_URL } from '../../api-config';
 
 interface AuthPageProps {
@@ -91,17 +93,23 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl text-center">{t('financeManager')}</CardTitle>
+    <div className="min-h-screen flex items-center justify-center bg-background text-foreground p-4 relative transition-colors duration-200">
+      <div className="fixed top-4 right-4 z-40">
+        <HeaderThemeSelector />
+      </div>
+      <Card className="w-full max-w-md border-border shadow-md">
+        <CardHeader className="text-center pb-4">
+          <div className="mx-auto w-12 h-12 rounded-2xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center mb-2 shadow-xs">
+            <Wallet className="h-6 w-6" />
+          </div>
+          <CardTitle className="text-2xl font-bold">{t('financeManager')}</CardTitle>
           <CardDescription className="text-center">
             {t('manageYourFinances')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-2 p-1 bg-muted/70 rounded-lg mb-4">
               <TabsTrigger value="login">{t('login')}</TabsTrigger>
               <TabsTrigger value="signup">{t('signup')}</TabsTrigger>
             </TabsList>

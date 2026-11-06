@@ -15,7 +15,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts';
-import { formatCurrency } from '../../lib/currency-config';
+import { useFormatCurrency } from '../hooks/useFormatCurrency';
 
 interface Expense {
   id: string;
@@ -50,6 +50,7 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82ca9d'
 
 export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashboardProps) {
   const t = useTranslation();
+  const formatCurrency = useFormatCurrency();
   // Calculate expense by category
   const expensesByCategory = expenses.reduce((acc, expense) => {
     const existing = acc.find(item => item.name === expense.category);
@@ -137,7 +138,7 @@ export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashbo
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '0.5rem', color: 'var(--card-foreground)' }} />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
@@ -171,7 +172,7 @@ export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashbo
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '0.5rem', color: 'var(--card-foreground)' }} />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
@@ -193,10 +194,10 @@ export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashbo
           {monthlyData.some(d => d.expenses > 0 || d.income > 0) ? (
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={monthlyData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.6} />
+                <XAxis dataKey="month" stroke="var(--muted-foreground)" fontSize={12} />
+                <YAxis stroke="var(--muted-foreground)" fontSize={12} />
+                <Tooltip contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '0.5rem', color: 'var(--card-foreground)' }} />
                 <Legend />
                 <Line type="monotone" dataKey="income" stroke="#10b981" strokeWidth={2} name="Income" />
                 <Line type="monotone" dataKey="expenses" stroke="#ef4444" strokeWidth={2} name="Expenses" />
@@ -220,11 +221,11 @@ export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashbo
           {topCategories.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={topCategories}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="value" fill="#8884d8" name="Amount" />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.6} />
+                <XAxis dataKey="name" stroke="var(--muted-foreground)" fontSize={12} />
+                <YAxis stroke="var(--muted-foreground)" fontSize={12} />
+                <Tooltip contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '0.5rem', color: 'var(--card-foreground)' }} />
+                <Bar dataKey="value" fill="var(--primary)" radius={[4, 4, 0, 0]} name="Amount" />
               </BarChart>
             </ResponsiveContainer>
           ) : (
@@ -254,7 +255,7 @@ export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashbo
                 </thead>
                 <tbody>
                   {assetPerformance.map((asset, index) => (
-                    <tr key={index} className="border-b hover:bg-gray-50">
+                    <tr key={index} className="border-b border-border hover:bg-muted/50">
                       <td className="py-3 px-4">{asset.name}</td>
                       <td className={`text-right py-3 px-4 ${asset.gain >= 0 ? 'text-green-600' : 'text-red-600'}`}>{formatCurrency(asset.gain)}
                       </td>

@@ -9,10 +9,22 @@ import { BudgetManager } from './budget-manager';
 import { AnalyticsDashboard } from './analytics-dashboard';
 import { BankAccountManager } from './bank-account-manager';
 import { CurrencySettings } from './currency-settings';
+import { HeaderThemeSelector } from './ui/theme-selector';
 import { useFormatCurrency } from '../hooks/useFormatCurrency';
 import { useTranslation } from '../hooks/useTranslation';
 import { useCurrency } from '../context/CurrencyContext';
-import { LogOut, TrendingUp, TrendingDown, Wallet, PiggyBank } from 'lucide-react';
+import { 
+  LogOut, 
+  TrendingUp, 
+  TrendingDown, 
+  Wallet, 
+  PiggyBank, 
+  Landmark, 
+  PieChart, 
+  BarChart3, 
+  Settings, 
+  LayoutDashboard 
+} from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import { projectId, publicAnonKey } from '../../../utils/supabase/info';
 import { API_BASE_URL } from '../../api-config';
@@ -147,83 +159,128 @@ export function Dashboard({ accessToken, onLogout }: DashboardProps) {
   }).reduce((sum, item) => sum + item.amount, 0);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-200">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">{t('financeManager')}</h1>
-              <p className="text-sm text-gray-600">{t('manageYourFinances')}</p>
+      <header className="bg-card border-b border-border transition-colors duration-200 sticky top-0 z-30 shadow-xs backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-primary/10 text-primary border border-primary/20 shadow-xs">
+                <Wallet className="h-6 w-6" />
+              </div>
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-card-foreground leading-tight">
+                  {t('financeManager')}
+                </h1>
+                <p className="text-xs sm:text-sm text-muted-foreground">{t('manageYourFinances')}</p>
+              </div>
             </div>
-            <Button onClick={handleLogout} variant="outline">
-              <LogOut className="mr-2 h-4 w-4" />
-              {t('logout')}
-            </Button>
+
+            <div className="flex items-center flex-wrap gap-2.5">
+              <HeaderThemeSelector />
+              <Button onClick={handleLogout} variant="outline" size="sm" className="gap-2">
+                <LogOut className="mr-1.5 h-4 w-4 text-muted-foreground" />
+                <span>{t('logout')}</span>
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+          <Card className="border-border shadow-xs hover:shadow-sm transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{t('netWorth')}</CardTitle>
-              <Wallet className="h-4 w-4 text-muted-foreground" />
+              <div className="p-1.5 rounded-md bg-muted text-muted-foreground">
+                <Wallet className="h-4 w-4" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(netWorth)}</div>
-              <p className="text-xs text-muted-foreground">Total assets minus expenses</p>
+              <div className="text-2xl font-bold text-foreground">{formatCurrency(netWorth)}</div>
+              <p className="text-xs text-muted-foreground mt-1">Total assets minus expenses</p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-border shadow-xs hover:shadow-sm transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{t('totalIncome')}</CardTitle>
-              <TrendingUp className="h-4 w-4 text-green-600" />
+              <div className="p-1.5 rounded-md bg-emerald-500/10 text-emerald-500">
+                <TrendingUp className="h-4 w-4" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{formatCurrency(totalIncome)}</div>
-              <p className="text-xs text-muted-foreground">{t('allTimeIncome')}</p>
+              <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{formatCurrency(totalIncome)}</div>
+              <p className="text-xs text-muted-foreground mt-1">{t('allTimeIncome')}</p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-border shadow-xs hover:shadow-sm transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{t('monthlyExpenses')}</CardTitle>
-              <TrendingDown className="h-4 w-4 text-red-600" />
+              <div className="p-1.5 rounded-md bg-destructive/10 text-destructive">
+                <TrendingDown className="h-4 w-4" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-600">{formatCurrency(monthlyExpenses)}</div>
-              <p className="text-xs text-muted-foreground">{t('thisMonth')}</p>
+              <div className="text-2xl font-bold text-destructive">{formatCurrency(monthlyExpenses)}</div>
+              <p className="text-xs text-muted-foreground mt-1">{t('thisMonth')}</p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-border shadow-xs hover:shadow-sm transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{t('totalAssets')}</CardTitle>
-              <PiggyBank className="h-4 w-4 text-blue-600" />
+              <div className="p-1.5 rounded-md bg-primary/10 text-primary">
+                <PiggyBank className="h-4 w-4" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{formatCurrency(totalAssets)}</div>
-              <p className="text-xs text-muted-foreground">{t('totalAssetsLabel').replace('{count}', assets.length.toString())}</p>
+              <div className="text-2xl font-bold text-primary">{formatCurrency(totalAssets)}</div>
+              <p className="text-xs text-muted-foreground mt-1">{t('totalAssetsLabel').replace('{count}', assets.length.toString())}</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-8">
-            <TabsTrigger value="dashboard">{t('dashboard')}</TabsTrigger>
-            <TabsTrigger value="income">{t('income')}</TabsTrigger>
-            <TabsTrigger value="expenses">{t('expenses')}</TabsTrigger>
-            <TabsTrigger value="assets">{t('assets')}</TabsTrigger>
-            <TabsTrigger value="bank">{t('bankAccounts')}</TabsTrigger>
-            <TabsTrigger value="budget">{t('budget')}</TabsTrigger>
-            <TabsTrigger value="analytics">{t('analytics')}</TabsTrigger>
-            <TabsTrigger value="settings">{t('settings')}</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
+            <TabsList className="inline-flex w-full min-w-[760px] lg:min-w-0 grid grid-cols-8 p-1.5 h-auto bg-muted/70 rounded-xl border border-border/50 shadow-xs gap-1">
+              <TabsTrigger value="dashboard" className="py-2.5 text-xs sm:text-sm font-medium gap-1.5 rounded-lg data-[state=active]:shadow-sm">
+                <LayoutDashboard className="h-4 w-4 shrink-0" />
+                <span className="truncate">{t('dashboard')}</span>
+              </TabsTrigger>
+              <TabsTrigger value="income" className="py-2.5 text-xs sm:text-sm font-medium gap-1.5 rounded-lg data-[state=active]:shadow-sm">
+                <TrendingUp className="h-4 w-4 shrink-0" />
+                <span className="truncate">{t('income')}</span>
+              </TabsTrigger>
+              <TabsTrigger value="expenses" className="py-2.5 text-xs sm:text-sm font-medium gap-1.5 rounded-lg data-[state=active]:shadow-sm">
+                <TrendingDown className="h-4 w-4 shrink-0" />
+                <span className="truncate">{t('expenses')}</span>
+              </TabsTrigger>
+              <TabsTrigger value="assets" className="py-2.5 text-xs sm:text-sm font-medium gap-1.5 rounded-lg data-[state=active]:shadow-sm">
+                <PiggyBank className="h-4 w-4 shrink-0" />
+                <span className="truncate">{t('assets')}</span>
+              </TabsTrigger>
+              <TabsTrigger value="bank" className="py-2.5 text-xs sm:text-sm font-medium gap-1.5 rounded-lg data-[state=active]:shadow-sm">
+                <Landmark className="h-4 w-4 shrink-0" />
+                <span className="truncate">{t('bankAccounts')}</span>
+              </TabsTrigger>
+              <TabsTrigger value="budget" className="py-2.5 text-xs sm:text-sm font-medium gap-1.5 rounded-lg data-[state=active]:shadow-sm">
+                <PieChart className="h-4 w-4 shrink-0" />
+                <span className="truncate">{t('budget')}</span>
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="py-2.5 text-xs sm:text-sm font-medium gap-1.5 rounded-lg data-[state=active]:shadow-sm">
+                <BarChart3 className="h-4 w-4 shrink-0" />
+                <span className="truncate">{t('analytics')}</span>
+              </TabsTrigger>
+              <TabsTrigger value="settings" className="py-2.5 text-xs sm:text-sm font-medium gap-1.5 rounded-lg data-[state=active]:shadow-sm">
+                <Settings className="h-4 w-4 shrink-0" />
+                <span className="truncate">{t('settings')}</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="dashboard" className="space-y-6">
             <AnalyticsDashboard 
