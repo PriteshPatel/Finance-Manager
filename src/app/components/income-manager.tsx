@@ -5,7 +5,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Plus, Pencil, Trash2, TrendingUp, IndianRupee  } from 'lucide-react';
+import { Plus, Pencil, Trash2, TrendingUp, Wallet, Receipt } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
 import { API_BASE_URL } from '../../api-config';
 import { useFormatCurrency } from '../hooks/useFormatCurrency';
@@ -162,7 +162,9 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t('totalIncome')}</CardTitle>
-            <IndianRupee className="h-4 w-4 text-green-600" />
+            <div className="p-1.5 rounded-md bg-emerald-500/10 text-emerald-500">
+              <TrendingUp className="h-4 w-4" />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">{formatCurrency(totalIncome)}</div>
@@ -173,7 +175,9 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t('thisMonth')}</CardTitle>
-            <TrendingUp className="h-4 w-4 text-green-600" />
+            <div className="p-1.5 rounded-md bg-emerald-500/10 text-emerald-500">
+              <Wallet className="h-4 w-4" />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">{formatCurrency(currentMonthIncome)}</div>
@@ -184,11 +188,13 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t('income')}</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <div className="p-1.5 rounded-md bg-muted text-muted-foreground">
+              <Receipt className="h-4 w-4" />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{filteredIncome.length}</div>
-            <p className="text-xs text-muted-foreground">{t('totalLanguages')}</p>
+            <p className="text-xs text-muted-foreground mt-1">Recorded transactions</p>
           </CardContent>
         </Card>
       </div>

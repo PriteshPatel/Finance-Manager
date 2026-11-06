@@ -191,7 +191,7 @@ export function BankAccountManager({ accessToken }: BankAccountManagerProps) {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">{t('bankAccounts')}</p>
+              <p className="text-sm text-muted-foreground">Total Accounts</p>
               <p className="text-2xl font-bold">{bankAccounts.length}</p>
             </div>
             <div className="space-y-1">
@@ -199,7 +199,7 @@ export function BankAccountManager({ accessToken }: BankAccountManagerProps) {
               <p className="text-2xl font-bold text-green-600">{formatCurrency(totalBalance)}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">{t('bankAccounts')}</p>
+              <p className="text-sm text-muted-foreground">Total Accounts</p>
               <p className="text-2xl font-bold">{bankAccounts.filter(a => a.balance > 0).length}</p>
             </div>
           </div>
