@@ -54,14 +54,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // 2. Set theme data attribute for custom selectors
     root.setAttribute('data-theme-id', theme);
 
-    // 3. Toggle dark class for Tailwind dark-mode compatibility
-    if (themeConfig.isDark) {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-
-    // 4. Remove any prior theme-* classes and add the current one
+    // 3. Remove any prior theme-* classes and add the current one
     AVAILABLE_THEMES.forEach((t) => {
       root.classList.remove(`theme-${t.id}`);
     });

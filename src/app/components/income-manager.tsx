@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -9,6 +9,7 @@ import { Plus, Pencil, Trash2, TrendingUp, Wallet, Receipt } from 'lucide-react'
 import { useTranslation } from '../hooks/useTranslation';
 import { API_BASE_URL } from '../../api-config';
 import { useFormatCurrency } from '../hooks/useFormatCurrency';
+import { FinancialDataTable, type FinancialDataColumn } from './financial-data-table';
 
 interface Income {
   id: string;
@@ -63,7 +64,13 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
     recurring: false,
   });
   const [filterSource, setFilterSource] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [minimumAmount, setMinimumAmount] = useState('');
+  const [maximumAmount, setMaximumAmount] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const [loading, setLoading] = useState(false);
+  const deferredSearchTerm = useDeferredValue(searchTerm);
 
   useEffect(() => {
     if (!isDialogOpen) return;
@@ -185,58 +192,133 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
     setEditingIncome(null);
   };
 
-  const filteredIncome = income.filter(item => {
-    if (filterSource === 'all') return true;
-    return item.source === filterSource;
-  });
+  const filteredIncome = useMemo(() => {
+    const query = deferredSearchTerm.trim().toLowerCase();
+    const minAmount = minimumAmount === '' ? undefined : Number(minimumAmount);
+    const maxAmount = maximumAmount === '' ? undefined : Number(maximumAmount);
 
-  const totalIncome = filteredIncome.reduce((sum, item) => sum + item.amount, 0);
-  const currentMonthIncome = income.filter(item => {
-    const itemDate = new Date(item.date);
+    return income.filter((item) => {
+      const matchesSearch = !query ||
+        item.source.toLowerCase().includes(query) ||
+        (item.description || '').toLowerCase().includes(query) ||
+        item.date.toLowerCase().includes(query) ||
+        String(item.amount).includes(query);
+      const matchesSource = filterSource === 'all' || item.source === filterSource;
+      const matchesMinimum = minAmount === undefined || item.amount >= minAmount;
+      const matchesMaximum = maxAmount === undefined || item.amount <= maxAmount;
+      const itemDate = item.date.slice(0, 10);
+      const matchesDateFrom = !dateFrom || itemDate >= dateFrom;
+      const matchesDateTo = !dateTo || itemDate <= dateTo;
+
+      return matchesSearch && matchesSource && matchesMinimum && matchesMaximum &&
+        matchesDateFrom && matchesDateTo;
+    });
+  }, [dateFrom, dateTo, deferredSearchTerm, filterSource, income, maximumAmount, minimumAmount]);
+
+  const totalIncome = useMemo(
+    () => filteredIncome.reduce((sum, item) => sum + item.amount, 0),
+    [filteredIncome],
+  );
+  const currentMonthIncome = useMemo(() => {
     const now = new Date();
-    return itemDate.getMonth() === now.getMonth() && itemDate.getFullYear() === now.getFullYear();
-  }).reduce((sum, item) => sum + item.amount, 0);
+    return income.filter((item) => {
+      const itemDate = new Date(item.date);
+      return itemDate.getMonth() === now.getMonth() && itemDate.getFullYear() === now.getFullYear();
+    }).reduce((sum, item) => sum + item.amount, 0);
+  }, [income]);
+  const bankAccountNames = useMemo(
+    () => new Map(bankAccounts.map((account) => [account.id, account.accountName])),
+    [bankAccounts],
+  );
+  const incomeColumns = useMemo<FinancialDataColumn<Income>[]>(() => [
+    {
+      id: 'date',
+      header: 'Date',
+      sortValue: (item) => item.date,
+      cell: (item) => new Date(item.date).toLocaleDateString(),
+    },
+    {
+      id: 'source',
+      header: 'Source',
+      sortValue: (item) => item.source,
+      cell: (item) => (
+        <div className="d-flex align-items-center gap-2 fw-medium">
+          {item.source}
+          {item.recurring && (
+            <span className="px-2 py-1 text-xs bg-muted-success fg-success fg-success rounded">
+              Recurring
+            </span>
+          )}
+        </div>
+      ),
+    },
+    {
+      id: 'description',
+      header: 'Description',
+      sortValue: (item) => item.description || '',
+      cell: (item) => (
+        <div className="app-max-w-80 text-wrap text-break">
+          {item.description || '—'}
+        </div>
+      ),
+    },
+    {
+      id: 'bankAccount',
+      header: 'Bank account',
+      sortValue: (item) => bankAccountNames.get(item.bankAccountId || '') || '',
+      cell: (item) => item.bankAccountId
+        ? bankAccountNames.get(item.bankAccountId) || 'Bank account'
+        : '—',
+    },
+    {
+      id: 'amount',
+      header: 'Amount',
+      sortValue: (item) => item.amount,
+      cell: (item) => <span className="fw-semibold fg-success fg-success">{formatCurrency(item.amount)}</span>,
+      className: 'text-end',
+    },
+  ], [bankAccountNames, formatCurrency]);
 
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('totalIncome')}</CardTitle>
-            <div className="p-1.5 rounded-md bg-emerald-500/10 text-emerald-500">
-              <TrendingUp className="h-4 w-4" />
+          <CardHeader className="d-flex flex-row align-items-center justify-content-between space-y-0 pb-2">
+            <CardTitle className="text-sm fw-medium">{t('totalIncome')}</CardTitle>
+            <div className="p-2 rounded-2 bg-muted-success fg-success">
+              <TrendingUp className="app-h-4 app-w-4" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{formatCurrency(totalIncome)}</div>
-            <p className="text-xs text-muted-foreground">{t('allTimeIncome')}</p>
+            <div className="text-2xl fw-bold fg-success">{formatCurrency(totalIncome)}</div>
+            <p className="text-xs fg-2">{t('allTimeIncome')}</p>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('thisMonth')}</CardTitle>
-            <div className="p-1.5 rounded-md bg-emerald-500/10 text-emerald-500">
-              <Wallet className="h-4 w-4" />
+          <CardHeader className="d-flex flex-row align-items-center justify-content-between space-y-0 pb-2">
+            <CardTitle className="text-sm fw-medium">{t('thisMonth')}</CardTitle>
+            <div className="p-2 rounded-2 bg-muted-success fg-success">
+              <Wallet className="app-h-4 app-w-4" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{formatCurrency(currentMonthIncome)}</div>
-            <p className="text-xs text-muted-foreground">{t('thisMonth')}</p>
+            <div className="text-2xl fw-bold fg-success">{formatCurrency(currentMonthIncome)}</div>
+            <p className="text-xs fg-2">{t('thisMonth')}</p>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('income')}</CardTitle>
-            <div className="p-1.5 rounded-md bg-muted text-muted-foreground">
-              <Receipt className="h-4 w-4" />
+          <CardHeader className="d-flex flex-row align-items-center justify-content-between space-y-0 pb-2">
+            <CardTitle className="text-sm fw-medium">{t('income')}</CardTitle>
+            <div className="p-2 rounded-2 bg-1 fg-2">
+              <Receipt className="app-h-4 app-w-4" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{filteredIncome.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">Recorded transactions</p>
+            <div className="text-2xl fw-bold">{filteredIncome.length}</div>
+            <p className="text-xs fg-2 mt-1">Recorded transactions</p>
           </CardContent>
         </Card>
       </div>
@@ -244,7 +326,7 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
       {/* Income List */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="d-flex align-items-center justify-content-between">
             <div>
               <CardTitle>{t('income')}</CardTitle>
               <CardDescription>{t('manageYourFinances')}</CardDescription>
@@ -255,7 +337,7 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
             }}>
               <DialogTrigger asChild>
                 <Button>
-                  <Plus className="mr-2 h-4 w-4" />
+                  <Plus className="me-2 app-h-4 app-w-4" />
                   {t('addNewIncome')}
                 </Button>
               </DialogTrigger>
@@ -266,9 +348,10 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
                     {editingIncome ? t('edit') : t('addNewIncome')}
                   </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleSubmit}>
-                  <div className="grid gap-4 py-4">
-                    <div className="space-y-2">
+                <form onSubmit={handleSubmit} className="d-flex flex-column gap-5">
+                  <div className="me-8 ms-8 mb-8">
+                  <div className="d-flex flex-column gap-3">
+                    <div className="d-flex flex-column gap-2">
                       <Label htmlFor="amount">{t('amount')}</Label>
                       <Input
                         id="amount"
@@ -280,7 +363,7 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
                         required
                       />
                     </div>
-                    <div className="space-y-2">
+                    <div className="d-flex flex-column gap-2">
                       <Label htmlFor="source">{t('incomeSource')}</Label>
                       <Select
                         value={formData.source}
@@ -299,7 +382,7 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="space-y-2">
+                    <div className="d-flex flex-column gap-2">
                       <Label htmlFor="incomeBankAccountId">Bank Account (optional)</Label>
                       <Select
                         value={formData.bankAccountId || 'unassigned'}
@@ -321,16 +404,16 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
                         </SelectContent>
                       </Select>
                       {bankAccountsError && (
-                        <p className="text-sm text-destructive">Bank accounts could not be loaded.</p>
+                        <p className="text-sm fg-danger">Bank accounts could not be loaded.</p>
                       )}
                       {bankAccountsLoading && (
-                        <p className="text-sm text-muted-foreground">Loading bank accounts...</p>
+                        <p className="text-sm fg-2">Loading bank accounts...</p>
                       )}
                       {!bankAccountsLoading && !bankAccountsError && bankAccounts.length === 0 && (
-                        <p className="text-sm text-muted-foreground">No bank accounts available.</p>
+                        <p className="text-sm fg-2">No bank accounts available.</p>
                       )}
                     </div>
-                    <div className="space-y-2">
+                    <div className="d-flex flex-column gap-2">
                       <Label htmlFor="date">{t('date')}</Label>
                       <Input
                         id="date"
@@ -340,7 +423,7 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
                         required
                       />
                     </div>
-                    <div className="space-y-2">
+                    <div className="d-flex flex-column gap-2">
                       <Label htmlFor="description">{t('description')}</Label>
                       <Input
                         id="description"
@@ -349,24 +432,26 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       />
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="d-flex align-items-center gap-2">
                       <input
                         type="checkbox"
                         id="recurring"
                         checked={formData.recurring}
                         onChange={(e) => setFormData({ ...formData, recurring: e.target.checked })}
-                        className="rounded border-gray-300"
+                        className="rounded border-keyline"
                       />
-                      <Label htmlFor="recurring" className="cursor-pointer">
+                      <Label htmlFor="recurring" className="app-cursor-pointer">
                         Recurring income
                       </Label>
                     </div>
                   </div>
+                   </div>
                   <DialogFooter>
                     <Button type="submit" disabled={loading}>
                       {loading ? 'Saving...' : editingIncome ? 'Update Income' : 'Add Income'}
                     </Button>
                   </DialogFooter>
+                 
                 </form>
               </DialogContent>
             </Dialog>
@@ -375,89 +460,97 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
         <CardContent>
           <div className="space-y-4">
             {/* Summary */}
-            <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl shadow-xs">
-              <p className="text-sm text-muted-foreground">{t('totalIncome')}</p>
-              <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+            <div className="p-4 bg-muted-success border border-subtle-success rounded-4 shadow-xs">
+              <p className="text-sm fg-2">{t('totalIncome')}</p>
+              <p className="text-2xl fw-bold fg-success fg-success">
                 {formatCurrency(filteredIncome.reduce((sum, item) => sum + item.amount, 0))}
               </p>
-              <p className="text-xs text-muted-foreground mt-0.5">{filteredIncome.length} entries</p>
+              <p className="text-xs fg-2 mt-1">{filteredIncome.length} entries</p>
             </div>
-            {/* Filter */}
-            <div className="flex items-center gap-4">
-              <Select value={filterSource} onValueChange={setFilterSource}>
-                <SelectTrigger className="w-[200px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Sources</SelectItem>
-                  {INCOME_SOURCES.map((source) => (
-                    <SelectItem key={source} value={source}>
-                      {source}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="space-y-2 app-sm-span-2 app-lg-span-3">
+                <Label htmlFor="income-search">Search income</Label>
+                <Input
+                  id="income-search"
+                  placeholder="Search source, description, date, or amount..."
+                  value={searchTerm}
+                  onChange={(event) => setSearchTerm(event.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="income-source-filter">Source</Label>
+                <Select value={filterSource} onValueChange={setFilterSource}>
+                  <SelectTrigger id="income-source-filter">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Sources</SelectItem>
+                    {INCOME_SOURCES.map((source) => (
+                      <SelectItem key={source} value={source}>{source}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="income-minimum">Minimum amount</Label>
+                <Input
+                  id="income-minimum"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={minimumAmount}
+                  onChange={(event) => setMinimumAmount(event.target.value)}
+                  placeholder="No minimum"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="income-maximum">Maximum amount</Label>
+                <Input
+                  id="income-maximum"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={maximumAmount}
+                  onChange={(event) => setMaximumAmount(event.target.value)}
+                  placeholder="No maximum"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="income-date-from">From date</Label>
+                <Input
+                  id="income-date-from"
+                  type="date"
+                  value={dateFrom}
+                  onChange={(event) => setDateFrom(event.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="income-date-to">To date</Label>
+                <Input
+                  id="income-date-to"
+                  type="date"
+                  value={dateTo}
+                  onChange={(event) => setDateTo(event.target.value)}
+                />
+              </div>
             </div>
 
-            {/* Income Items */}
-            {filteredIncome.length === 0 ? (
-              <div className="text-center py-12">
-                <TrendingUp className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-sm font-semibold text-foreground">No income records</h3>
-                <p className="mt-1 text-sm text-muted-foreground">Get started by adding your first income entry.</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {filteredIncome
-                  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-                  .map((item) => (
-                    <div key={item.id} className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-semibold">{item.source}</h4>
-                          {item.recurring && (
-                            <span className="px-2 py-0.5 text-xs bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-medium rounded">
-                              Recurring
-                            </span>
-                          )}
-                        </div>
-                        {item.description && (
-                          <p className="text-sm text-gray-600 mt-1">{item.description}</p>
-                        )}
-                        {item.bankAccountId && (
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {bankAccounts.find((account) => account.id === item.bankAccountId)?.accountName || 'Bank account'}
-                          </p>
-                        )}
-                        <p className="text-xs text-gray-500 mt-1">
-                          {new Date(item.date).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="text-right mr-4">
-                          <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
-                            {formatCurrency(item.amount)}
-                          </p>
-                        </div>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => handleEdit(item)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => handleDelete(item.id)}
-                        >
-                          <Trash2 className="h-4 w-4 text-red-600" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            )}
+            <FinancialDataTable
+              rows={filteredIncome}
+              columns={incomeColumns}
+              getRowId={(item) => item.id}
+              emptyMessage="No income records match these filters."
+              renderActions={(item) => (
+                <>
+                  <Button size="icon" variant="ghost" aria-label="Edit income" onClick={() => handleEdit(item)}>
+                    <Pencil className="app-h-4 app-w-4" />
+                  </Button>
+                  <Button size="icon" variant="ghost" aria-label="Delete income" onClick={() => handleDelete(item.id)}>
+                    <Trash2 className="app-h-4 app-w-4 fg-danger" />
+                  </Button>
+                </>
+              )}
+            />
           </div>
         </CardContent>
       </Card>

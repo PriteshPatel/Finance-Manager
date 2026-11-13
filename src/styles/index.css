@@ -1,3 +1,5 @@
-@import './fonts.css';
-@import './tailwind.css';
+@import "bootstrap/dist/css/bootstrap.css" layer(bootstrap);
 @import './theme.css';
+@import './app.css' layer(components);
+
+@layer bootstrap, theme, base, components, utilities, properties;

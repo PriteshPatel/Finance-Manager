@@ -171,12 +171,12 @@ export function BankAccountManager({ accessToken }: BankAccountManagerProps) {
   const getAccountIcon = (type: string) => {
     switch (type) {
       case 'Credit Card':
-        return <CreditCard className="h-5 w-5" />;
+        return <CreditCard className="app-h-5 app-w-5" />;
       case 'Savings':
       case 'Checking':
-        return <Building2 className="h-5 w-5" />;
+        return <Building2 className="app-h-5 app-w-5" />;
       default:
-        return <Wallet className="h-5 w-5" />;
+        return <Wallet className="app-h-5 app-w-5" />;
     }
   };
 
@@ -191,16 +191,16 @@ export function BankAccountManager({ accessToken }: BankAccountManagerProps) {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">Total Accounts</p>
-              <p className="text-2xl font-bold">{bankAccounts.length}</p>
+              <p className="text-sm fg-2">Total Accounts</p>
+              <p className="text-2xl fw-bold">{bankAccounts.length}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">{t('totalAssets')}</p>
-              <p className="text-2xl font-bold text-green-600">{formatCurrency(totalBalance)}</p>
+              <p className="text-sm fg-2">{t('totalAssets')}</p>
+              <p className="text-2xl fw-bold fg-success">{formatCurrency(totalBalance)}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">Total Accounts</p>
-              <p className="text-2xl font-bold">{bankAccounts.filter(a => a.balance > 0).length}</p>
+              <p className="text-sm fg-2">Total Accounts</p>
+              <p className="text-2xl fw-bold">{bankAccounts.filter(a => a.balance > 0).length}</p>
             </div>
           </div>
         </CardContent>
@@ -209,7 +209,7 @@ export function BankAccountManager({ accessToken }: BankAccountManagerProps) {
       {/* Bank Accounts List */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="d-flex align-items-center justify-content-between">
             <div>
               <CardTitle>{t('bankAccounts')}</CardTitle>
               <CardDescription>{t('manageYourFinances')}</CardDescription>
@@ -220,7 +220,7 @@ export function BankAccountManager({ accessToken }: BankAccountManagerProps) {
             }}>
               <DialogTrigger asChild>
                 <Button>
-                  <Plus className="mr-2 h-4 w-4" />
+                  <Plus className="me-2 app-h-4 app-w-4" />
                   {t('addNewIncome')}
                 </Button>
               </DialogTrigger>
@@ -231,9 +231,10 @@ export function BankAccountManager({ accessToken }: BankAccountManagerProps) {
                     {editingAccount ? 'Update the bank account details' : 'Enter the details of your new bank account'}
                   </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleSubmit}>
-                  <div className="grid gap-4 py-4">
-                    <div className="space-y-2">
+                <form onSubmit={handleSubmit} className="d-flex flex-column gap-3">
+                  <div className="me-8 ms-8 mb-8">
+                  <div className="d-flex flex-column gap-3">
+                    <div className="d-flex flex-column gap-2">
                       <Label htmlFor="accountName">Account Name</Label>
                       <Input
                         id="accountName"
@@ -243,7 +244,7 @@ export function BankAccountManager({ accessToken }: BankAccountManagerProps) {
                         required
                       />
                     </div>
-                    <div className="space-y-2">
+                    <div className="d-flex flex-column gap-2">
                       <Label htmlFor="bankName">Bank Name</Label>
                       <Input
                         id="bankName"
@@ -253,7 +254,7 @@ export function BankAccountManager({ accessToken }: BankAccountManagerProps) {
                         required
                       />
                     </div>
-                    <div className="space-y-2">
+                    <div className="d-flex flex-column gap-2">
                       <Label htmlFor="accountNumber">Account Number (Last 4 digits)</Label>
                       <Input
                         id="accountNumber"
@@ -263,7 +264,7 @@ export function BankAccountManager({ accessToken }: BankAccountManagerProps) {
                         required
                       />
                     </div>
-                    <div className="space-y-2">
+                    <div className="d-flex flex-column gap-2">
                       <Label htmlFor="accountType">Account Type</Label>
                       <Select
                         value={formData.accountType}
@@ -282,38 +283,43 @@ export function BankAccountManager({ accessToken }: BankAccountManagerProps) {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="balance">Balance</Label>
-                        <Input
-                          id="balance"
-                          type="number"
-                          step="0.01"
-                          placeholder="0.00"
-                          value={formData.balance}
-                          onChange={(e) => setFormData({ ...formData, balance: e.target.value })}
-                          required
-                        />
+                    <div className="row row-cols-1 sm:row-cols-2 g-3 mx-0">
+                      <div className="col">
+                        <div className="d-flex flex-column gap-2">
+                          <Label htmlFor="balance">Balance</Label>
+                          <Input
+                            id="balance"
+                            type="number"
+                            step="0.01"
+                            placeholder="0.00"
+                            value={formData.balance}
+                            onChange={(e) => setFormData({ ...formData, balance: e.target.value })}
+                            required
+                          />
+                        </div>
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="currency">Currency</Label>
-                        <Select
-                          value={formData.currency}
-                          onValueChange={(value) => setFormData({ ...formData, currency: value })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {CURRENCIES.map((curr) => (
-                              <SelectItem key={curr} value={curr}>
-                                {curr}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                      <div className="col">
+                        <div className="d-flex flex-column gap-2">
+                          <Label htmlFor="currency">Currency</Label>
+                          <Select
+                            value={formData.currency}
+                            onValueChange={(value) => setFormData({ ...formData, currency: value })}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {CURRENCIES.map((curr) => (
+                                <SelectItem key={curr} value={curr}>
+                                  {curr}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
                     </div>
+                  </div>
                   </div>
                   <DialogFooter>
                     <Button type="submit" disabled={loading}>
@@ -329,40 +335,40 @@ export function BankAccountManager({ accessToken }: BankAccountManagerProps) {
           <div className="space-y-4">
             {/* Total Balance Summary */}
             {bankAccounts.length > 0 && (
-              <div className="p-4 bg-primary/10 border border-primary/20 rounded-xl shadow-xs">
-                <p className="text-sm text-muted-foreground">Total Liquid Cash</p>
-                <p className="text-2xl font-bold text-primary">
+              <div className="p-4 bg-muted-primary border border-subtle-primary rounded-4 shadow-xs">
+                <p className="text-sm fg-2">Total Liquid Cash</p>
+                <p className="text-2xl fw-bold fg-primary">
                   {formatCurrency(bankAccounts.reduce((sum, a) => sum + a.balance, 0))}
                 </p>
-                <p className="text-xs text-muted-foreground mt-0.5">{bankAccounts.length} linked accounts</p>
+                <p className="text-xs fg-2 mt-1">{bankAccounts.length} linked accounts</p>
               </div>
             )}
             {bankAccounts.length === 0 ? (
               <div className="text-center py-12">
-                <Building2 className="mx-auto h-12 w-12 text-muted-foreground" />
-                <h3 className="mt-2 text-sm font-semibold text-foreground">No bank accounts</h3>
-                <p className="mt-1 text-sm text-muted-foreground">Get started by adding your first bank account.</p>
+                <Building2 className="mx-auto app-h-12 app-w-12 fg-2" />
+                <h3 className="mt-2 text-sm fw-semibold fg-body">No bank accounts</h3>
+                <p className="mt-1 text-sm fg-2">Get started by adding your first bank account.</p>
               </div>
             ) : (
               bankAccounts.map((account) => (
                 <Card key={account.id}>
                   <CardContent className="pt-6">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                      <div className="flex items-start space-x-4">
-                        <div className="p-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl shadow-xs">
+                    <div className="d-flex flex-column sm:flex-row align-items-start sm:align-items-center justify-content-between gap-4">
+                      <div className="d-flex align-items-start space-x-4">
+                        <div className="p-3 bg-muted-primary fg-primary border border-subtle-primary rounded-4 shadow-xs">
                           {getAccountIcon(account.accountType)}
                         </div>
                         <div>
-                          <h4 className="font-semibold">{account.accountName}</h4>
-                          <p className="text-sm text-muted-foreground">{account.bankName}</p>
-                          <p className="text-xs text-muted-foreground mt-1">
+                          <h4 className="fw-semibold">{account.accountName}</h4>
+                          <p className="text-sm fg-2">{account.bankName}</p>
+                          <p className="text-xs fg-2 mt-1">
                             {account.accountType} • {account.accountNumber}
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <div className="text-right mr-4">
-                          <p className="text-xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                      <div className="d-flex align-items-center space-x-2">
+                        <div className="text-end me-4">
+                          <p className="text-xl app-sm-text-xl fw-bold fg-success fg-success">
                             {account.currency} {account.balance.toLocaleString()}
                           </p>
                         </div>
@@ -371,14 +377,14 @@ export function BankAccountManager({ accessToken }: BankAccountManagerProps) {
                           variant="ghost"
                           onClick={() => handleEdit(account)}
                         >
-                          <Pencil className="h-4 w-4" />
+                          <Pencil className="app-h-4 app-w-4" />
                         </Button>
                         <Button
                           size="icon"
                           variant="ghost"
                           onClick={() => handleDelete(account.id)}
                         >
-                          <Trash2 className="h-4 w-4 text-red-600" />
+                          <Trash2 className="app-h-4 app-w-4 fg-danger" />
                         </Button>
                       </div>
                     </div>

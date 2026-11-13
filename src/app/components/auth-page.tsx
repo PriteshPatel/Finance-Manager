@@ -93,23 +93,23 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background text-foreground p-4 relative transition-colors duration-200">
-      <div className="fixed top-4 right-4 z-40">
+    <div className="min-vh-100 d-flex align-items-center justify-content-center bg-body fg-body p-4 position-relative app-transition ">
+      <div className="position-fixed app-top-4 app-end-4 z-fixed">
         <HeaderThemeSelector />
       </div>
-      <Card className="w-full max-w-md border-border shadow-md">
+      <Card className="w-100 app-max-w-md border-keyline shadow">
         <CardHeader className="text-center pb-4">
-          <div className="mx-auto w-12 h-12 rounded-2xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center mb-2 shadow-xs">
-            <Wallet className="h-6 w-6" />
+          <div className="mx-auto app-w-12 app-h-12 rounded-5 bg-muted-primary fg-primary border border-subtle-primary d-flex align-items-center justify-content-center mb-2 shadow-xs">
+            <Wallet className="app-h-6 app-w-6" />
           </div>
-          <CardTitle className="text-2xl font-bold">{t('financeManager')}</CardTitle>
+          <CardTitle className="text-2xl fw-bold">{t('financeManager')}</CardTitle>
           <CardDescription className="text-center">
             {t('manageYourFinances')}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 p-1 bg-muted/70 rounded-lg mb-4">
+          <Tabs defaultValue="login" className="w-100">
+            <TabsList className="grid w-100 grid-cols-2 p-1 app-bg-muted-70 rounded-3 mb-4">
               <TabsTrigger value="login">{t('login')}</TabsTrigger>
               <TabsTrigger value="signup">{t('signup')}</TabsTrigger>
             </TabsList>
@@ -138,8 +138,8 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
                     required
                   />
                 </div>
-                {error && <p className="text-sm text-red-600">{error}</p>}
-                <Button type="submit" className="w-full" disabled={loading}>
+                {error && <p className="text-sm fg-danger">{error}</p>}
+                <Button type="submit" className="w-100" disabled={loading}>
                   {loading ? t('loading') : t('login')}
                 </Button>
               </form>
@@ -180,8 +180,8 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
                     required
                   />
                 </div>
-                {error && <p className="text-sm text-red-600">{error}</p>}
-                <Button type="submit" className="w-full" disabled={loading}>
+                {error && <p className="text-sm fg-danger">{error}</p>}
+                <Button type="submit" className="w-100" disabled={loading}>
                   {loading ? t('loading') : t('signup')}
                 </Button>
               </form>

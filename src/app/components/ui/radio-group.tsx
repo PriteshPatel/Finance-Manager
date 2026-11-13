@@ -27,16 +27,16 @@ function RadioGroupItem({
     <RadioGroupPrimitive.Item
       data-slot="radio-group-item"
       className={cn(
-        "border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
+        "app-border-input fg-primary app-focus-ring app-focus-ring app-invalid app-invalid app-invalid app-dark-input app-aspect-square app-size-4 flex-shrink-0 rounded-pill border shadow-xs app-transition app-outline-none app-focus-ring app-disabled app-disabled",
         className,
       )}
       {...props}
     >
       <RadioGroupPrimitive.Indicator
         data-slot="radio-group-indicator"
-        className="relative flex items-center justify-center"
+        className="position-relative d-flex align-items-center justify-content-center"
       >
-        <CircleIcon className="fill-primary absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2" />
+        <CircleIcon className="app-fill-primary position-absolute top-50 start-50 app-size-2 translate-middle-x translate-middle-y" />
       </RadioGroupPrimitive.Indicator>
     </RadioGroupPrimitive.Item>
   );

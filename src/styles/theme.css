@@ -1,8 +1,6 @@
-@custom-variant dark (&:is(.dark *));
-
 /* =========================================================================
- * Bootstrap v6 Alpha Theme Integration
- * Design tokens reference: https://getbootstrap.com/docs/6.0/customize/color-modes/
+ * Bootstrap 6 alpha theme tokens.
+ * https://getbootstrap.com/docs/6.0/customize/color-modes/
  * ========================================================================= */
 
 /* 1. Default & Bootstrap 6 Light */
@@ -22,7 +20,7 @@
   --secondary: #e9ecef;
   --secondary-foreground: #212529;
   --muted: #f1f3f5;
-  --muted-foreground: #6c757d;
+  --muted-foreground: #626970;
   --accent: #e7f1ff;
   --accent-foreground: #0a58ca;
   --destructive: #dc3545;
@@ -52,7 +50,6 @@
 
 /* 2. Bootstrap 6 Charcoal Dark */
 [data-bs-theme="dark"],
-.dark,
 .theme-bootstrap-dark {
   color-scheme: dark;
   --background: #0f1115;
@@ -62,7 +59,7 @@
   --popover: #181b20;
   --popover-foreground: #f8f9fa;
   --primary: #3d8bfd;
-  --primary-foreground: #ffffff;
+  --primary-foreground: #212529;
   --secondary: #212529;
   --secondary-foreground: #f8f9fa;
   --muted: #212529;
@@ -191,7 +188,7 @@
   --popover: #ffffff;
   --popover-foreground: #451a03;
   --primary: #d97706;
-  --primary-foreground: #ffffff;
+  --primary-foreground: #212529;
   --secondary: #fef3c7;
   --secondary-foreground: #92400e;
   --muted: #fef3c7;
@@ -309,69 +306,127 @@
   --sidebar-ring: #d63384;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-input-background: var(--input-background);
-  --color-switch-background: var(--switch-background);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 2px);
-  --radius-md: var(--radius);
-  --radius-lg: calc(var(--radius) + 2px);
-  --radius-xl: calc(var(--radius) + 6px);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+/* Bridge the app's semantic palette into Bootstrap 6's public CSS variables. */
+:root,
+[data-bs-theme="light"],
+[data-bs-theme="dark"],
+[data-bs-theme="indigo"],
+[data-bs-theme="emerald"],
+[data-bs-theme="amber"],
+[data-bs-theme="cyber"],
+[data-bs-theme="rose"],
+.theme-bootstrap-light,
+.theme-bootstrap-dark,
+.theme-bootstrap-indigo,
+.theme-bootstrap-emerald,
+.theme-bootstrap-amber,
+.theme-bootstrap-cyber,
+.theme-bootstrap-rose {
+  --bs-bg-body: var(--background);
+  --bs-bg-1: var(--muted);
+  --bs-bg-2: var(--secondary);
+  --bs-bg-3: var(--accent);
+  --bs-bg-fg: var(--foreground);
+  --bs-fg-body: var(--foreground);
+  --bs-fg-1: var(--foreground);
+  --bs-fg-2: var(--muted-foreground);
+  --bs-fg-3: var(--muted-foreground);
+  --bs-fg-4: var(--muted-foreground);
+  --bs-primary-base: var(--primary);
+  --bs-primary-bg: var(--primary);
+  --bs-primary-fg: var(--accent-foreground);
+  --bs-primary-fg-emphasis: var(--accent-foreground);
+  --bs-primary-contrast: var(--primary-foreground);
+  --bs-primary-bg-subtle: var(--accent);
+  --bs-primary-bg-muted: var(--accent);
+  --bs-primary-border: var(--border);
+  --bs-primary-focus-ring: var(--ring);
+  --bs-link-color: var(--accent-foreground);
+  --bs-link-hover-color: var(--accent-foreground);
+  --bs-secondary-base: var(--secondary);
+  --bs-secondary-bg: var(--secondary);
+  --bs-secondary-bg-muted: color-mix(in srgb, var(--secondary) 12%, var(--background));
+  --bs-secondary-bg-subtle: var(--secondary);
+  --bs-secondary-contrast: var(--secondary-foreground);
+  --bs-secondary-fg: var(--secondary-foreground);
+  --bs-secondary-fg-emphasis: var(--secondary-foreground);
+  --bs-accent-base: var(--accent);
+  --bs-accent-bg: var(--accent);
+  --bs-accent-bg-muted: color-mix(in srgb, var(--accent) 12%, var(--background));
+  --bs-accent-bg-subtle: var(--accent);
+  --bs-accent-border: var(--border);
+  --bs-accent-contrast: var(--foreground);
+  --bs-accent-fg: var(--accent-foreground);
+  --bs-accent-fg-emphasis: var(--accent-foreground);
+  --bs-accent-focus-ring: var(--ring);
+  --bs-success-base: var(--chart-2);
+  --bs-success-bg: var(--chart-2);
+  --bs-success-bg-muted: color-mix(in srgb, var(--chart-2) 12%, var(--background));
+  --bs-success-bg-subtle: color-mix(in srgb, var(--chart-2) 18%, var(--background));
+  --bs-success-border: color-mix(in srgb, var(--chart-2) 35%, var(--border));
+  --bs-success-contrast: var(--foreground);
+  --bs-success-fg: var(--chart-2);
+  --bs-success-fg-emphasis: var(--chart-2);
+  --bs-success-focus-ring: var(--chart-2);
+  --bs-danger-base: var(--destructive);
+  --bs-danger-bg: var(--destructive);
+  --bs-danger-bg-muted: color-mix(in srgb, var(--destructive) 12%, var(--background));
+  --bs-danger-bg-subtle: color-mix(in srgb, var(--destructive) 18%, var(--background));
+  --bs-danger-border: color-mix(in srgb, var(--destructive) 35%, var(--border));
+  --bs-danger-contrast: var(--destructive-foreground);
+  --bs-danger-fg: var(--destructive);
+  --bs-danger-fg-emphasis: var(--destructive);
+  --bs-danger-focus-ring: var(--ring);
+  --bs-warning-base: var(--chart-4);
+  --bs-warning-bg: var(--chart-4);
+  --bs-warning-bg-muted: color-mix(in srgb, var(--chart-4) 12%, var(--background));
+  --bs-warning-bg-subtle: color-mix(in srgb, var(--chart-4) 18%, var(--background));
+  --bs-warning-border: color-mix(in srgb, var(--chart-4) 35%, var(--border));
+  --bs-warning-contrast: var(--foreground);
+  --bs-warning-fg: var(--chart-4);
+  --bs-warning-fg-emphasis: var(--chart-4);
+  --bs-warning-focus-ring: var(--chart-4);
+  --bs-info-base: var(--chart-3);
+  --bs-info-bg: var(--chart-3);
+  --bs-info-bg-muted: color-mix(in srgb, var(--chart-3) 12%, var(--background));
+  --bs-info-bg-subtle: color-mix(in srgb, var(--chart-3) 18%, var(--background));
+  --bs-info-border: color-mix(in srgb, var(--chart-3) 35%, var(--border));
+  --bs-info-contrast: var(--foreground);
+  --bs-info-fg: var(--chart-3);
+  --bs-info-fg-emphasis: var(--chart-3);
+  --bs-info-focus-ring: var(--chart-3);
+  --bs-inverse-base: var(--foreground);
+  --bs-inverse-bg: var(--foreground);
+  --bs-inverse-bg-muted: var(--muted);
+  --bs-inverse-bg-subtle: var(--muted);
+  --bs-inverse-border: var(--border);
+  --bs-inverse-contrast: var(--background);
+  --bs-inverse-fg: var(--background);
+  --bs-inverse-fg-emphasis: var(--background);
+  --bs-inverse-focus-ring: var(--ring);
+  --bs-border-color: var(--border);
+  --bs-border-body: var(--border);
+  --bs-border-muted: var(--border);
+  --bs-card-bg: var(--card);
+  --bs-card-border-color: var(--border);
+  --bs-btn-input-bg: var(--input-background);
+  --bs-btn-input-fg: var(--foreground);
+  --bs-control-border-color: var(--input);
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
-    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 150ms;
+    border-color: var(--border);
   }
 
   html {
     font-size: var(--font-size);
-    width: 100%;
-    margin: 0;
-    padding: 0;
   }
 
   body {
-    @apply bg-background text-foreground;
-    width: 100%;
+    color: var(--foreground);
+    background-color: var(--background);
     min-height: 100vh;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
   }
 
   #root {
@@ -381,45 +436,28 @@
     flex-direction: column;
   }
 
-  h1 {
-    font-size: var(--text-2xl);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 
-  h2 {
-    font-size: var(--text-xl);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
+  .nav-pills .nav-link[aria-selected="true"] {
+    color: var(--bs-primary-contrast);
+    background-color: var(--bs-primary-bg);
   }
 
-  h3 {
-    font-size: var(--text-lg);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
+  .dialog-backdrop {
+    background-color: var(--bs-dialog-backdrop-bg);
+    backdrop-filter: blur(var(--bs-dialog-backdrop-blur));
   }
 
-  h4 {
-    font-size: var(--text-base);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
-  }
-
-  label {
-    font-size: var(--text-base);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
-  }
-
-  button {
-    font-size: var(--text-base);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
-  }
-
-  input {
-    font-size: var(--text-base);
-    font-weight: var(--font-weight-normal);
-    line-height: 1.5;
+  .menu-item[data-state="checked"] {
+    font-weight: var(--bs-font-weight-semibold);
   }
 }

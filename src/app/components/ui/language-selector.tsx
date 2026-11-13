@@ -23,32 +23,32 @@ export function LanguageSelector({ onSelect, showLabel = true }: LanguageSelecto
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-full justify-start">
-          <span className="text-lg mr-2">{currentLanguage.flag}</span>
-          <span className="font-semibold">{currentLanguage.nativeName}</span>
+        <Button variant="outline" className="w-100 justify-content-start">
+          <span className="text-lg me-2">{currentLanguage.flag}</span>
+          <span className="fw-semibold">{currentLanguage.nativeName}</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-md">
+      <DialogContent className="app-max-w-md">
         <DialogHeader>
           <DialogTitle>{t('selectLanguage')}</DialogTitle>
           <DialogDescription>
             {t('yourActiveLanguage')}
           </DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-2 gap-3 max-h-96 overflow-y-auto">
+        <div className="grid grid-cols-2 gap-3 app-max-h-96 overflow-y-auto">
           {SUPPORTED_LANGUAGES.map((language) => (
             <button
               key={language.code}
               onClick={() => handleSelect(language.code as LanguageCode)}
-              className={`p-3 rounded-lg border-2 transition-all hover:shadow-md ${
+              className={`p-3 rounded-3 border-2 app-transition app-hover-shadow-md ${
                 selectedLanguage === language.code
-                  ? 'border-primary bg-primary/10 text-primary font-bold shadow-xs'
-                  : 'border-border hover:border-primary/40 bg-card text-card-foreground'
+                  ? 'border-primary bg-muted-primary fg-primary fw-bold shadow-xs'
+                  : 'border-keyline app-hover-border-primary app-bg-card fg-body'
               }`}
             >
               <div className="text-2xl mb-1">{language.flag}</div>
-              <div className="text-xs font-semibold">{language.nativeName}</div>
-              <div className="text-xs text-muted-foreground">{language.name}</div>
+              <div className="text-xs fw-semibold">{language.nativeName}</div>
+              <div className="text-xs fg-2">{language.name}</div>
             </button>
           ))}
         </div>
@@ -70,12 +70,12 @@ export function LanguageBadge({ code = 'en', size = 'md' }: LanguageBadgeProps) 
 
   const sizeClasses = {
     sm: 'px-2 py-1 text-xs',
-    md: 'px-3 py-1.5 text-sm',
-    lg: 'px-4 py-2 text-base',
+    md: 'px-3 py-2 text-sm',
+    lg: 'px-4 py-2 text-md',
   };
 
   return (
-    <span className={`bg-primary/10 text-primary border border-primary/20 rounded-full font-semibold inline-flex items-center gap-1 ${sizeClasses[size]}`}>
+    <span className={`bg-muted-primary fg-primary border border-subtle-primary rounded-pill fw-semibold d-inline-flex align-items-center gap-1 ${sizeClasses[size]}`}>
       <span>{language.flag}</span>
       <span>{language.nativeName}</span>
     </span>
@@ -97,16 +97,16 @@ export function LanguageCard({ code = 'en', onClick, isSelected = false }: Langu
   return (
     <div
       onClick={onClick}
-      className={`p-4 rounded-lg border-2 cursor-pointer transition-all hover:shadow-lg ${
+      className={`p-4 rounded-3 border-2 app-cursor-pointer app-transition app-hover-shadow-lg ${
         isSelected
-          ? 'border-primary ring-2 ring-primary/20 bg-card text-card-foreground shadow-xs'
-          : 'border-border hover:border-primary/40 bg-card text-card-foreground'
+          ? 'border-primary app-focus-ring app-focus-ring app-bg-card fg-body shadow-xs'
+          : 'border-keyline app-hover-border-primary app-bg-card fg-body'
       }`}
     >
       <div className="text-4xl mb-2">{language.flag}</div>
-      <h3 className="font-bold text-lg">{language.nativeName}</h3>
-      <p className="text-sm text-muted-foreground">{language.name}</p>
-      {isSelected && <span className="text-xs bg-primary text-primary-foreground font-semibold px-2 py-0.5 rounded-full inline-block mt-2">Active</span>}
+      <h3 className="fw-bold text-lg">{language.nativeName}</h3>
+      <p className="text-sm fg-2">{language.name}</p>
+      {isSelected && <span className="text-xs bg-primary fg-contrast-primary fw-semibold px-2 py-1 rounded-pill d-inline-block mt-2">Active</span>}
     </div>
   );
 }
@@ -120,13 +120,13 @@ export function LanguageInfo() {
   const language = getLanguageDetails(selectedLanguage);
 
   return (
-    <div className="bg-card p-4 rounded-xl border border-border shadow-xs">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+    <div className="app-bg-card p-4 rounded-4 border border-keyline shadow-xs">
+      <div className="d-flex align-items-center justify-content-between">
+        <div className="d-flex align-items-center gap-3">
           <span className="text-4xl">{language.flag}</span>
           <div>
-            <h3 className="font-bold text-lg">{language.nativeName}</h3>
-            <p className="text-sm text-muted-foreground">{language.name}</p>
+            <h3 className="fw-bold text-lg">{language.nativeName}</h3>
+            <p className="text-sm fg-2">{language.name}</p>
           </div>
         </div>
       </div>

@@ -27,10 +27,10 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
+      <div className="min-vh-100 d-flex align-items-center justify-content-center bg-body fg-body">
         <div className="text-center" >
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
+          <div className="spinner-border rounded-pill app-h-12 app-w-12 border-bottom border-2 border-primary mx-auto mb-4"></div>
+          <p className="fg-2">Loading...</p>
         </div>
       </div>
     );

@@ -205,7 +205,7 @@ export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashbo
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+              <div className="d-flex align-items-center justify-content-center app-h-300 fg-2">
                 No expense data available
               </div>
             )}
@@ -239,7 +239,7 @@ export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashbo
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+              <div className="d-flex align-items-center justify-content-center app-h-300 fg-2">
                 No asset data available
               </div>
             )}
@@ -267,7 +267,7 @@ export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashbo
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+            <div className="d-flex align-items-center justify-content-center app-h-300 fg-2">
               No transaction data available
             </div>
           )}
@@ -277,14 +277,14 @@ export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashbo
       {/* Daily Trend Chart with Date Range Selection */}
       <Card>
         <CardHeader>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="d-flex flex-column sm:flex-row sm:align-items-center justify-content-between gap-4">
             <div>
               <CardTitle>{t('dailyTrend')}</CardTitle>
               <CardDescription>{t('dailyTrendDescription')}</CardDescription>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="d-flex flex-wrap align-items-center gap-2">
               <Select value={dateRange} onValueChange={setDateRange}>
-                <SelectTrigger className="w-[160px]">
+                <SelectTrigger className="app-w-160px">
                   <SelectValue placeholder="Select range" />
                 </SelectTrigger>
                 <SelectContent>
@@ -295,10 +295,10 @@ export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashbo
                 </SelectContent>
               </Select>
               {dateRange === 'custom' && (
-                <div className="flex items-center gap-2">
+                <div className="d-flex align-items-center gap-2">
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="outline" className="w-[140px] justify-start text-left font-normal">
+                      <Button variant="outline" className="app-w-140px justify-content-start text-start fw-normal">
                         {customStartDate ? format(customStartDate, 'MMM dd') : t('from')}
                       </Button>
                     </PopoverTrigger>
@@ -313,7 +313,7 @@ export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashbo
                   </Popover>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="outline" className="w-[140px] justify-start text-left font-normal">
+                      <Button variant="outline" className="app-w-140px justify-content-start text-start fw-normal">
                         {customEndDate ? format(customEndDate, 'MMM dd') : t('to')}
                       </Button>
                     </PopoverTrigger>
@@ -348,7 +348,7 @@ export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashbo
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+            <div className="d-flex align-items-center justify-content-center app-h-300 fg-2">
               No transaction data available for selected date range
             </div>
           )}
@@ -373,7 +373,7 @@ export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashbo
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+            <div className="d-flex align-items-center justify-content-center app-h-300 fg-2">
               No expense categories to display
             </div>
           )}
@@ -389,21 +389,21 @@ export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashbo
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-100">
                 <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-2 px-4">Asset</th>
-                    <th className="text-right py-2 px-4">Gain/Loss</th>
-                    <th className="text-right py-2 px-4">Percentage</th>
+                  <tr className="border-bottom">
+                    <th className="text-start py-2 px-4">Asset</th>
+                    <th className="text-end py-2 px-4">Gain/Loss</th>
+                    <th className="text-end py-2 px-4">Percentage</th>
                   </tr>
                 </thead>
                 <tbody>
                   {assetPerformance.map((asset, index) => (
-                    <tr key={index} className="border-b border-border hover:bg-muted/50">
+                    <tr key={index} className="border-bottom border-keyline app-hover-muted">
                       <td className="py-3 px-4">{asset.name}</td>
-                      <td className={`text-right py-3 px-4 ${asset.gain >= 0 ? 'text-green-600' : 'text-red-600'}`}>{formatCurrency(asset.gain)}
+                      <td className={`text-end py-3 px-4 ${asset.gain >= 0 ? 'fg-success' : 'fg-danger'}`}>{formatCurrency(asset.gain)}
                       </td>
-                      <td className={`text-right py-3 px-4 ${asset.gain >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      <td className={`text-end py-3 px-4 ${asset.gain >= 0 ? 'fg-success' : 'fg-danger'}`}>
                         {asset.percentage}%
                       </td>
                     </tr>

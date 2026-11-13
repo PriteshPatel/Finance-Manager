@@ -6,7 +6,10 @@ import * as RechartsPrimitive from "recharts";
 import { cn } from "./utils";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
-const THEMES = { light: "", dark: ".dark" } as const;
+const THEMES = {
+  light: "",
+  dark: ':is([data-bs-theme="dark"], [data-bs-theme="indigo"], [data-bs-theme="cyber"])',
+} as const;
 
 export type ChartConfig = {
   [k in string]: {
@@ -55,7 +58,7 @@ function ChartContainer({
         data-slot="chart"
         data-chart={chartId}
         className={cn(
-          "[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border flex aspect-video justify-center text-xs [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
+          "app-chart-colors app-chart-colors app-chart-colors app-chart-colors app-chart-colors app-chart-colors app-chart-colors d-flex app-aspect-video justify-content-center text-xs app-chart-colors app-chart-colors app-chart-colors app-chart-colors app-chart-colors",
           className,
         )}
         {...props}
@@ -143,7 +146,7 @@ function ChartTooltipContent({
 
     if (labelFormatter) {
       return (
-        <div className={cn("font-medium", labelClassName)}>
+        <div className={cn("fw-medium", labelClassName)}>
           {labelFormatter(value, payload)}
         </div>
       );
@@ -153,7 +156,7 @@ function ChartTooltipContent({
       return null;
     }
 
-    return <div className={cn("font-medium", labelClassName)}>{value}</div>;
+    return <div className={cn("fw-medium", labelClassName)}>{value}</div>;
   }, [
     label,
     labelFormatter,
@@ -173,12 +176,12 @@ function ChartTooltipContent({
   return (
     <div
       className={cn(
-        "border-border/50 bg-background grid min-w-[8rem] items-start gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs shadow-xl",
+        "app-border-half bg-body grid app-min-w-8 align-items-start gap-2 rounded-3 border px-3 py-2 text-xs shadow-xl",
         className,
       )}
     >
       {!nestLabel ? tooltipLabel : null}
-      <div className="grid gap-1.5">
+      <div className="grid gap-2">
         {payload.map((item, index) => {
           const key = `${nameKey || item.name || item.dataKey || "value"}`;
           const itemConfig = getPayloadConfigFromPayload(config, item, key);
@@ -188,8 +191,8 @@ function ChartTooltipContent({
             <div
               key={item.dataKey}
               className={cn(
-                "[&>svg]:text-muted-foreground flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5",
-                indicator === "dot" && "items-center",
+                "app-icon-muted d-flex w-100 flex-wrap align-items-stretch gap-2 app-chart-icons app-chart-icons",
+                indicator === "dot" && "align-items-center",
               )}
             >
               {formatter && item?.value !== undefined && item.name ? (
@@ -202,13 +205,13 @@ function ChartTooltipContent({
                     !hideIndicator && (
                       <div
                         className={cn(
-                          "shrink-0 rounded-[2px] border-(--color-border) bg-(--color-bg)",
+                          "flex-shrink-0 rounded-1 app-border-variable app-bg-variable",
                           {
-                            "h-2.5 w-2.5": indicator === "dot",
+                            "app-h-2-5 app-w-2-5": indicator === "dot",
                             "w-1": indicator === "line",
-                            "w-0 border-[1.5px] border-dashed bg-transparent":
+                            "app-w-0 app-border-1-5 app-border-dashed bg-transparent":
                               indicator === "dashed",
-                            "my-0.5": nestLabel && indicator === "dashed",
+                            "my-1": nestLabel && indicator === "dashed",
                           },
                         )}
                         style={
@@ -222,18 +225,18 @@ function ChartTooltipContent({
                   )}
                   <div
                     className={cn(
-                      "flex flex-1 justify-between leading-none",
-                      nestLabel ? "items-end" : "items-center",
+                      "d-flex flex-fill justify-content-between lh-1",
+                      nestLabel ? "align-items-end" : "align-items-center",
                     )}
                   >
-                    <div className="grid gap-1.5">
+                    <div className="grid gap-2">
                       {nestLabel ? tooltipLabel : null}
-                      <span className="text-muted-foreground">
+                      <span className="fg-2">
                         {itemConfig?.label || item.name}
                       </span>
                     </div>
                     {item.value && (
-                      <span className="text-foreground font-mono font-medium tabular-nums">
+                      <span className="fg-body font-monospace fw-medium app-tabular-nums">
                         {item.value.toLocaleString()}
                       </span>
                     )}
@@ -270,7 +273,7 @@ function ChartLegendContent({
   return (
     <div
       className={cn(
-        "flex items-center justify-center gap-4",
+        "d-flex align-items-center justify-content-center gap-4",
         verticalAlign === "top" ? "pb-3" : "pt-3",
         className,
       )}
@@ -283,14 +286,14 @@ function ChartLegendContent({
           <div
             key={item.value}
             className={cn(
-              "[&>svg]:text-muted-foreground flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3",
+              "app-icon-muted d-flex align-items-center gap-2 app-chart-icons app-chart-icons",
             )}
           >
             {itemConfig?.icon && !hideIcon ? (
               <itemConfig.icon />
             ) : (
               <div
-                className="h-2 w-2 shrink-0 rounded-[2px]"
+                className="app-h-2 app-w-2 flex-shrink-0 rounded-1"
                 style={{
                   backgroundColor: item.color,
                 }}

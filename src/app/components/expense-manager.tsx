@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -9,6 +9,7 @@ import { Plus, Pencil, Trash2, Search } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
 import { useFormatCurrency } from '../hooks/useFormatCurrency';
 import { API_BASE_URL } from '../../api-config';
+import { FinancialDataTable, type FinancialDataColumn } from './financial-data-table';
 
 interface Expense {
   id: string;
@@ -82,7 +83,12 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
+  const [minimumAmount, setMinimumAmount] = useState('');
+  const [maximumAmount, setMaximumAmount] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const [loading, setLoading] = useState(false);
+  const deferredSearchTerm = useDeferredValue(searchTerm);
 
   useEffect(() => {
     if (!isDialogOpen) return;
@@ -217,21 +223,98 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
     setEditingExpense(null);
   };
 
-  const filteredExpenses = expenses.filter(expense => {
-    const matchesSearch = expense.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      expense.category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = filterCategory === 'all' || expense.category === filterCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredExpenses = useMemo(() => {
+    const query = deferredSearchTerm.trim().toLowerCase();
+    const minAmount = minimumAmount === '' ? undefined : Number(minimumAmount);
+    const maxAmount = maximumAmount === '' ? undefined : Number(maximumAmount);
 
-  const totalAmount = filteredExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+    return expenses.filter((expense) => {
+      const matchesSearch = !query ||
+        expense.description.toLowerCase().includes(query) ||
+        expense.category.toLowerCase().includes(query) ||
+        expense.date.toLowerCase().includes(query) ||
+        String(expense.amount).includes(query) ||
+        expense.tags?.some((tag) => tag.toLowerCase().includes(query)) === true;
+      const matchesCategory = filterCategory === 'all' || expense.category === filterCategory;
+      const matchesMinimum = minAmount === undefined || expense.amount >= minAmount;
+      const matchesMaximum = maxAmount === undefined || expense.amount <= maxAmount;
+      const expenseDate = expense.date.slice(0, 10);
+      const matchesDateFrom = !dateFrom || expenseDate >= dateFrom;
+      const matchesDateTo = !dateTo || expenseDate <= dateTo;
+
+      return matchesSearch && matchesCategory && matchesMinimum && matchesMaximum &&
+        matchesDateFrom && matchesDateTo;
+    });
+  }, [dateFrom, dateTo, deferredSearchTerm, expenses, filterCategory, maximumAmount, minimumAmount]);
+
+  const totalAmount = useMemo(
+    () => filteredExpenses.reduce((sum, exp) => sum + exp.amount, 0),
+    [filteredExpenses],
+  );
+  const bankAccountNames = useMemo(
+    () => new Map(bankAccounts.map((account) => [account.id, account.accountName])),
+    [bankAccounts],
+  );
+  const expenseColumns = useMemo<FinancialDataColumn<Expense>[]>(() => [
+    {
+      id: 'date',
+      header: 'Date',
+      sortValue: (expense) => expense.date,
+      cell: (expense) => new Date(expense.date).toLocaleDateString(),
+    },
+    {
+      id: 'description',
+      header: 'Description',
+      sortValue: (expense) => expense.description,
+      cell: (expense) => (
+        <div className="app-min-w-40 app-max-w-80 text-wrap text-break">
+          <div className="d-flex flex-wrap align-items-center gap-2 fw-medium">
+            <span className="text-break">{expense.description}</span>
+            {expense.recurring && (
+              <span className="text-xs bg-muted-primary fg-primary px-2 py-1 rounded">Recurring</span>
+            )}
+          </div>
+          {expense.tags && expense.tags.length > 0 && (
+            <div className="mt-1 d-flex flex-wrap gap-1">
+              {expense.tags.map((tag, index) => (
+                <span key={`${tag}-${index}`} className="rounded bg-1 px-2 py-1 text-xs fg-2">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      ),
+    },
+    {
+      id: 'category',
+      header: 'Category',
+      sortValue: (expense) => expense.category,
+      cell: (expense) => expense.category,
+    },
+    {
+      id: 'bankAccount',
+      header: 'Bank account',
+      sortValue: (expense) => bankAccountNames.get(expense.bankAccountId || '') || '',
+      cell: (expense) => expense.bankAccountId
+        ? bankAccountNames.get(expense.bankAccountId) || 'Bank account'
+        : '—',
+    },
+    {
+      id: 'amount',
+      header: 'Amount',
+      sortValue: (expense) => expense.amount,
+      cell: (expense) => <span className="fw-semibold">{formatCurrency(expense.amount)}</span>,
+      className: 'text-end',
+    },
+  ], [bankAccountNames, formatCurrency]);
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <Card>
         <CardHeader>
-          <div className="flex justify-between items-center">
+          <div className="d-flex justify-content-between align-items-center">
             <div>
               <CardTitle>{t('expenses')}</CardTitle>
               <CardDescription>{t('manageYourFinances')}</CardDescription>
@@ -239,19 +322,20 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button onClick={resetForm}>
-                  <Plus className="mr-2 h-4 w-4" />
+                  <Plus className="me-2 app-h-4 app-w-4" />
                   {t('addNewExpense')}
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-md">
+              <DialogContent className="app-max-w-md">
                 <DialogHeader>
                   <DialogTitle>{editingExpense ? t('edit') : t('addNewExpense')}</DialogTitle>
                   <DialogDescription>
                     {editingExpense ? t('edit') : t('addNewExpense')}
                   </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="space-y-2">
+                <form onSubmit={handleSubmit} className="d-flex flex-column gap-3">
+                  <div className="me-8 ms-8 mb-8">
+                  <div className="d-flex flex-column gap-2">
                     <Label htmlFor="amount">{t('amount')}</Label>
                     <Input
                       id="amount"
@@ -264,7 +348,7 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
                     />
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="d-flex flex-column gap-2">
                     <Label htmlFor="category">{t('expenseCategory')}</Label>
                     <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
                       <SelectTrigger>
@@ -280,7 +364,7 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
                     </Select>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="d-flex flex-column gap-2">
                     <Label htmlFor="bankAccountId">Bank Account (optional)</Label>
                     <Select
                       value={formData.bankAccountId || 'unassigned'}
@@ -302,17 +386,17 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
                       </SelectContent>
                     </Select>
                     {bankAccountsError && (
-                      <p className="text-sm text-destructive">Bank accounts could not be loaded.</p>
+                      <p className="text-sm fg-danger">Bank accounts could not be loaded.</p>
                     )}
                     {bankAccountsLoading && (
-                      <p className="text-sm text-muted-foreground">Loading bank accounts...</p>
+                      <p className="text-sm fg-2">Loading bank accounts...</p>
                     )}
                     {!bankAccountsLoading && !bankAccountsError && bankAccounts.length === 0 && (
-                      <p className="text-sm text-muted-foreground">No bank accounts available.</p>
+                      <p className="text-sm fg-2">No bank accounts available.</p>
                     )}
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="d-flex flex-column gap-2">
                     <Label htmlFor="description">{t('description')}</Label>
                     <Input
                       id="description"
@@ -323,7 +407,7 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
                     />
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="d-flex flex-column gap-2">
                     <Label htmlFor="date">Date</Label>
                     <Input
                       id="date"
@@ -334,7 +418,7 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
                     />
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="d-flex flex-column gap-2">
                     <Label htmlFor="tags">Tags (comma-separated)</Label>
                     <Input
                       id="tags"
@@ -344,7 +428,7 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
                     />
                   </div>
 
-                  <div className="flex items-center space-x-2">
+                  <div className="d-flex align-items-center gap-2">
                     <input
                       id="recurring"
                       type="checkbox"
@@ -352,11 +436,11 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
                       onChange={(e) => setFormData({ ...formData, recurring: e.target.checked })}
                       className="rounded"
                     />
-                    <Label htmlFor="recurring" className="cursor-pointer">
+                    <Label htmlFor="recurring" className="app-cursor-pointer">
                       Recurring expense
                     </Label>
                   </div>
-
+ </div>
                   <DialogFooter>
                     <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                       Cancel
@@ -365,6 +449,7 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
                       {loading ? 'Saving...' : editingExpense ? 'Update' : 'Add'}
                     </Button>
                   </DialogFooter>
+                 
                 </form>
               </DialogContent>
             </Dialog>
@@ -372,20 +457,21 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
         </CardHeader>
         <CardContent>
           {/* Filters */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="app-sm-span-2 app-lg-span-3">
+              <div className="position-relative">
+                <Search className="position-absolute app-start-3 top-50  translate-middle-y app-h-4 app-w-4 fg-3" />
                 <Input
                   placeholder="Search expenses..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="app-ps-10"
                 />
               </div>
             </div>
-            <div className="w-full sm:w-48">
-              <Select value={filterCategory} onValueChange={setFilterCategory}>
+            <div className="space-y-2">
+                <Label htmlFor="income-source-filter">Source</Label>
+                 <Select value={filterCategory} onValueChange={setFilterCategory}>
                 <SelectTrigger>
                   <SelectValue placeholder="Filter by category" />
                 </SelectTrigger>
@@ -399,83 +485,73 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
                 </SelectContent>
               </Select>
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="expense-minimum">Minimum amount</Label>
+              <Input
+                id="expense-minimum"
+                type="number"
+                min="0"
+                step="0.01"
+                value={minimumAmount}
+                onChange={(event) => setMinimumAmount(event.target.value)}
+                placeholder="No minimum"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="expense-maximum">Maximum amount</Label>
+              <Input
+                id="expense-maximum"
+                type="number"
+                min="0"
+                step="0.01"
+                value={maximumAmount}
+                onChange={(event) => setMaximumAmount(event.target.value)}
+                placeholder="No maximum"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="expense-date-from">From date</Label>
+              <Input
+                id="expense-date-from"
+                type="date"
+                value={dateFrom}
+                onChange={(event) => setDateFrom(event.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="expense-date-to">To date</Label>
+              <Input
+                id="expense-date-to"
+                type="date"
+                value={dateTo}
+                onChange={(event) => setDateTo(event.target.value)}
+              />
+            </div>
           </div>
 
           {/* Summary */}
-          <div className="mb-4 p-4 bg-primary/10 border border-primary/20 rounded-xl shadow-xs">
-            <p className="text-sm text-muted-foreground">Total Expenses</p>
-            <p className="text-2xl font-bold text-primary">{formatCurrency(totalAmount)}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">{filteredExpenses.length} transactions</p>
+          <div className="mb-4 p-4 bg-muted-primary border border-subtle-primary rounded-4 shadow-xs">
+            <p className="text-sm fg-2">Total Expenses</p>
+            <p className="text-2xl fw-bold fg-primary">{formatCurrency(totalAmount)}</p>
+            <p className="text-xs fg-2 mt-1">{filteredExpenses.length} transactions</p>
           </div>
 
-          {/* Expense List */}
-          <div className="space-y-4">
-            {filteredExpenses.length === 0 ? (
-              <div className="text-center py-12 text-muted-foreground">
-                <p>No expenses found</p>
-                <p className="text-sm">Add your first expense to get started</p>
-              </div>
-            ) : (
-              filteredExpenses
-                .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-                .map((expense) => (
-                  <div
-                    key={expense.id}
-                    className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-semibold">{expense.description}</h4>
-                        {expense.recurring && (
-                          <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
-                            Recurring
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground">{expense.category}</p>
-                      {expense.bankAccountId && (
-                        <p className="text-xs text-muted-foreground">
-                          {bankAccounts.find((account) => account.id === expense.bankAccountId)?.accountName || 'Bank account'}
-                        </p>
-                      )}
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(expense.date).toLocaleDateString()}
-                      </p>
-                      {expense.tags && expense.tags.length > 0 && (
-                        <div className="flex gap-1 mt-1">
-                          {expense.tags.map((tag, index) => (
-                            <span key={index} className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded">
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <p className="font-bold text-lg">{formatCurrency(expense.amount)}</p>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => handleEdit(expense)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => handleDelete(expense.id)}
-                        >
-                          <Trash2 className="h-4 w-4 text-red-600" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))
+          <FinancialDataTable
+            rows={filteredExpenses}
+            columns={expenseColumns}
+            getRowId={(expense) => expense.id}
+            emptyMessage="No expenses match these filters."
+            renderActions={(expense) => (
+              <>
+                <Button size="icon" variant="ghost" aria-label="Edit expense" onClick={() => handleEdit(expense)}>
+                  <Pencil className="app-h-4 app-w-4" />
+                </Button>
+                <Button size="icon" variant="ghost" aria-label="Delete expense" onClick={() => handleDelete(expense.id)}>
+                  <Trash2 className="app-h-4 app-w-4 fg-danger" />
+                </Button>
+              </>
             )}
-          </div>
+          />
         </CardContent>
       </Card>
     </div>

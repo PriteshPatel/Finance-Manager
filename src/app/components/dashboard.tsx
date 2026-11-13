@@ -160,27 +160,27 @@ export function Dashboard({ accessToken, onLogout }: DashboardProps) {
   }).reduce((sum, item) => sum + item.amount, 0);
 
   return (
-    <div className="min-h-screen w-full flex flex-col bg-background text-foreground transition-colors duration-200">
+    <div className="min-vh-100 w-100 d-flex flex-column bg-body fg-body app-transition ">
       {/* Header */}
-      <header className="w-full bg-card border-b border-border transition-colors duration-200 sticky top-0 z-30 shadow-xs backdrop-blur-md">
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-primary/10 text-primary border border-primary/20 shadow-xs">
-                <Wallet className="h-6 w-6" />
+      <header className="w-100 app-bg-card border-bottom border-keyline app-transition  position-sticky top-0 z-sticky shadow-xs app-backdrop-blur">
+        <div className="w-100 app-max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="d-flex flex-column sm:flex-row sm:align-items-center justify-content-between gap-4">
+            <div className="d-flex align-items-center gap-3">
+              <div className="p-3 rounded-4 bg-muted-primary fg-primary border border-subtle-primary shadow-xs">
+                <Wallet className="app-h-6 app-w-6" />
               </div>
               <div>
-                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-card-foreground leading-tight">
+                <h1 className="text-xl app-sm-text-xl fw-bold app-tracking-tight fg-body lh-sm">
                   {t('financeManager')}
                 </h1>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">{t('manageYourFinances')}</p>
+                <p className="text-xs app-sm-text-sm fg-2 mt-1">{t('manageYourFinances')}</p>
               </div>
             </div>
 
-            <div className="flex items-center flex-wrap gap-3">
+            <div className="d-flex align-items-center flex-wrap gap-3">
               <HeaderThemeSelector />
               <Button onClick={handleLogout} variant="outline" size="sm" className="gap-2">
-                <LogOut className="mr-1 h-4 w-4 text-muted-foreground" />
+                <LogOut className="me-1 app-h-4 app-w-4 fg-2" />
                 <span>{t('logout')}</span>
               </Button>
             </div>
@@ -188,96 +188,96 @@ export function Dashboard({ accessToken, onLogout }: DashboardProps) {
         </div>
       </header>
 
-      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 space-y-8">
+      <main className="w-100 app-max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-fill space-y-8">
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          <Card className="border-border shadow-xs hover:shadow-sm transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('netWorth')}</CardTitle>
-              <div className="p-1.5 rounded-md bg-muted text-muted-foreground">
-                <Wallet className="h-4 w-4" />
+          <Card className="border-keyline shadow-xs app-hover-shadow app-transition">
+            <CardHeader className="d-flex flex-row align-items-center justify-content-between space-y-0 pb-2">
+              <CardTitle className="text-sm fw-medium">{t('netWorth')}</CardTitle>
+              <div className="p-2 rounded-2 bg-1 fg-2">
+                <Wallet className="app-h-4 app-w-4" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-foreground">{formatCurrency(netWorth)}</div>
-              <p className="text-xs text-muted-foreground mt-1">Total assets minus expenses</p>
+              <div className="text-2xl fw-bold fg-body">{formatCurrency(netWorth)}</div>
+              <p className="text-xs fg-2 mt-1">Total assets minus expenses</p>
             </CardContent>
           </Card>
 
-          <Card className="border-border shadow-xs hover:shadow-sm transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('totalIncome')}</CardTitle>
-              <div className="p-1.5 rounded-md bg-emerald-500/10 text-emerald-500">
-                <TrendingUp className="h-4 w-4" />
+          <Card className="border-keyline shadow-xs app-hover-shadow app-transition">
+            <CardHeader className="d-flex flex-row align-items-center justify-content-between space-y-0 pb-2">
+              <CardTitle className="text-sm fw-medium">{t('totalIncome')}</CardTitle>
+              <div className="p-2 rounded-2 bg-muted-success fg-success">
+                <TrendingUp className="app-h-4 app-w-4" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{formatCurrency(totalIncome)}</div>
-              <p className="text-xs text-muted-foreground mt-1">{t('allTimeIncome')}</p>
+              <div className="text-2xl fw-bold fg-success fg-success">{formatCurrency(totalIncome)}</div>
+              <p className="text-xs fg-2 mt-1">{t('allTimeIncome')}</p>
             </CardContent>
           </Card>
 
-          <Card className="border-border shadow-xs hover:shadow-sm transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('monthlyExpenses')}</CardTitle>
-              <div className="p-1.5 rounded-md bg-destructive/10 text-destructive">
-                <TrendingDown className="h-4 w-4" />
+          <Card className="border-keyline shadow-xs app-hover-shadow app-transition">
+            <CardHeader className="d-flex flex-row align-items-center justify-content-between space-y-0 pb-2">
+              <CardTitle className="text-sm fw-medium">{t('monthlyExpenses')}</CardTitle>
+              <div className="p-2 rounded-2 bg-muted-danger fg-danger">
+                <TrendingDown className="app-h-4 app-w-4" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-destructive">{formatCurrency(monthlyExpenses)}</div>
-              <p className="text-xs text-muted-foreground mt-1">{t('thisMonth')}</p>
+              <div className="text-2xl fw-bold fg-danger">{formatCurrency(monthlyExpenses)}</div>
+              <p className="text-xs fg-2 mt-1">{t('thisMonth')}</p>
             </CardContent>
           </Card>
 
-          <Card className="border-border shadow-xs hover:shadow-sm transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('totalAssets')}</CardTitle>
-              <div className="p-1.5 rounded-md bg-primary/10 text-primary">
-                <PiggyBank className="h-4 w-4" />
+          <Card className="border-keyline shadow-xs app-hover-shadow app-transition">
+            <CardHeader className="d-flex flex-row align-items-center justify-content-between space-y-0 pb-2">
+              <CardTitle className="text-sm fw-medium">{t('totalAssets')}</CardTitle>
+              <div className="p-2 rounded-2 bg-muted-primary fg-primary">
+                <PiggyBank className="app-h-4 app-w-4" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-primary">{formatCurrency(totalAssets)}</div>
-              <p className="text-xs text-muted-foreground mt-1">{t('totalAssetsLabel').replace('{count}', assets.length.toString())}</p>
+              <div className="text-2xl fw-bold fg-primary">{formatCurrency(totalAssets)}</div>
+              <p className="text-xs fg-2 mt-1">{t('totalAssetsLabel').replace('{count}', assets.length.toString())}</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Main Content Tabs */}
-        <Tabs defaultValue="dashboard" className="w-full space-y-6">
-          <TabsList className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 p-1.5 h-auto bg-muted/80 rounded-xl border border-border shadow-xs w-full">
-            <TabsTrigger value="dashboard" className="h-11 py-2 px-3 text-xs sm:text-sm font-medium gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all">
-              <LayoutDashboard className="h-4 w-4 shrink-0" />
-              <span className="truncate">{t('dashboard')}</span>
+        <Tabs defaultValue="dashboard" className="w-100 space-y-6">
+          <TabsList className="grid grid-cols-2 sm:grid-cols-4 app-lg-grid-8 gap-2 p-2 h-auto app-bg-muted-80 rounded-4 border border-keyline shadow-xs w-100">
+            <TabsTrigger value="dashboard" className="app-h-11 py-2 px-3 text-xs app-sm-text-sm fw-medium gap-2 rounded-3 radix-tab-active radix-tab-active radix-tab-active app-transition">
+              <LayoutDashboard className="app-h-4 app-w-4 flex-shrink-0" />
+              <span className="text-truncate">{t('dashboard')}</span>
             </TabsTrigger>
-            <TabsTrigger value="income" className="h-11 py-2 px-3 text-xs sm:text-sm font-medium gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all">
-              <TrendingUp className="h-4 w-4 shrink-0" />
-              <span className="truncate">{t('income')}</span>
+            <TabsTrigger value="income" className="app-h-11 py-2 px-3 text-xs app-sm-text-sm fw-medium gap-2 rounded-3 radix-tab-active radix-tab-active radix-tab-active app-transition">
+              <TrendingUp className="app-h-4 app-w-4 flex-shrink-0" />
+              <span className="text-truncate">{t('income')}</span>
             </TabsTrigger>
-            <TabsTrigger value="expenses" className="h-11 py-2 px-3 text-xs sm:text-sm font-medium gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all">
-              <TrendingDown className="h-4 w-4 shrink-0" />
-              <span className="truncate">{t('expenses')}</span>
+            <TabsTrigger value="expenses" className="app-h-11 py-2 px-3 text-xs app-sm-text-sm fw-medium gap-2 rounded-3 radix-tab-active radix-tab-active radix-tab-active app-transition">
+              <TrendingDown className="app-h-4 app-w-4 flex-shrink-0" />
+              <span className="text-truncate">{t('expenses')}</span>
             </TabsTrigger>
-            <TabsTrigger value="assets" className="h-11 py-2 px-3 text-xs sm:text-sm font-medium gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all">
-              <PiggyBank className="h-4 w-4 shrink-0" />
-              <span className="truncate">{t('assets')}</span>
+            <TabsTrigger value="assets" className="app-h-11 py-2 px-3 text-xs app-sm-text-sm fw-medium gap-2 rounded-3 radix-tab-active radix-tab-active radix-tab-active app-transition">
+              <PiggyBank className="app-h-4 app-w-4 flex-shrink-0" />
+              <span className="text-truncate">{t('assets')}</span>
             </TabsTrigger>
-            <TabsTrigger value="bank" className="h-11 py-2 px-3 text-xs sm:text-sm font-medium gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all">
-              <Landmark className="h-4 w-4 shrink-0" />
-              <span className="truncate">{t('bankAccounts')}</span>
+            <TabsTrigger value="bank" className="app-h-11 py-2 px-3 text-xs app-sm-text-sm fw-medium gap-2 rounded-3 radix-tab-active radix-tab-active radix-tab-active app-transition">
+              <Landmark className="app-h-4 app-w-4 flex-shrink-0" />
+              <span className="text-truncate">{t('bankAccounts')}</span>
             </TabsTrigger>
-            <TabsTrigger value="budget" className="h-11 py-2 px-3 text-xs sm:text-sm font-medium gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all">
-              <PieChart className="h-4 w-4 shrink-0" />
-              <span className="truncate">{t('budget')}</span>
+            <TabsTrigger value="budget" className="app-h-11 py-2 px-3 text-xs app-sm-text-sm fw-medium gap-2 rounded-3 radix-tab-active radix-tab-active radix-tab-active app-transition">
+              <PieChart className="app-h-4 app-w-4 flex-shrink-0" />
+              <span className="text-truncate">{t('budget')}</span>
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="h-11 py-2 px-3 text-xs sm:text-sm font-medium gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all">
-              <BarChart3 className="h-4 w-4 shrink-0" />
-              <span className="truncate">{t('analytics')}</span>
+            <TabsTrigger value="analytics" className="app-h-11 py-2 px-3 text-xs app-sm-text-sm fw-medium gap-2 rounded-3 radix-tab-active radix-tab-active radix-tab-active app-transition">
+              <BarChart3 className="app-h-4 app-w-4 flex-shrink-0" />
+              <span className="text-truncate">{t('analytics')}</span>
             </TabsTrigger>
-            <TabsTrigger value="settings" className="h-11 py-2 px-3 text-xs sm:text-sm font-medium gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all">
-              <Settings className="h-4 w-4 shrink-0" />
-              <span className="truncate">{t('settings')}</span>
+            <TabsTrigger value="settings" className="app-h-11 py-2 px-3 text-xs app-sm-text-sm fw-medium gap-2 rounded-3 radix-tab-active radix-tab-active radix-tab-active app-transition">
+              <Settings className="app-h-4 app-w-4 flex-shrink-0" />
+              <span className="text-truncate">{t('settings')}</span>
             </TabsTrigger>
           </TabsList>
 

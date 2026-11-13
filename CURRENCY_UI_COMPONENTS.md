@@ -46,7 +46,7 @@ import { CurrencyBadge } from './ui/currency-selector';
 **Sizes:**
 - **sm**: Small compact badge (text-xs)
 - **md**: Medium badge (text-sm) - default
-- **lg**: Large badge (text-base)
+- **lg**: Large badge (text-md)
 
 ### 3. CurrencyCard
 Card-style display with interactive selection.
@@ -116,19 +116,19 @@ Each currency has a unique color scheme:
 
 ```tsx
 // INR - Orange
-bg-orange-100 text-orange-800
+bg-subtle-warning fg-warning
 
 // USD - Blue
-bg-blue-100 text-blue-800
+bg-subtle-primary fg-primary
 
 // EUR - Green
-bg-green-100 text-green-800
+bg-subtle-success fg-success
 
 // GBP - Purple
-bg-purple-100 text-purple-800
+bg-subtle-info fg-info
 
 // JPY - Red
-bg-red-100 text-red-800
+bg-subtle-danger fg-danger
 ```
 
 ## Usage Examples
@@ -180,7 +180,7 @@ export function CurrencyGrid() {
 
 ## Styling
 
-All components use Tailwind CSS with:
+All components use Bootstrap 6 alpha utilities and theme tokens with:
 - Responsive design
 - Hover effects
 - Active states

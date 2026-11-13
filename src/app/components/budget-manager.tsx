@@ -189,14 +189,14 @@ export function BudgetManager({ accessToken, expenses }: BudgetManagerProps) {
       {/* Header */}
       <Card>
         <CardHeader>
-          <div className="flex justify-between items-center">
+          <div className="d-flex justify-content-between align-items-center">
             <div>
               <CardTitle>{t('budget')}</CardTitle>
               <CardDescription>{t('manageYourFinances')}</CardDescription>
             </div>
-            <div className="flex gap-4 items-center">
-              <div className="w-48">
-                <Label htmlFor="month-select" className="text-sm mb-2 block">{t('selectMonth')}</Label>
+            <div className="d-flex gap-4 align-items-center">
+              <div className="app-w-48">
+                <Label htmlFor="month-select" className="text-sm mb-2 d-block">{t('selectMonth')}</Label>
                 <Input
                   id="month-select"
                   type="month"
@@ -207,11 +207,11 @@ export function BudgetManager({ accessToken, expenses }: BudgetManagerProps) {
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
                   <Button onClick={resetForm} className="mt-6">
-                    <Plus className="mr-2 h-4 w-4" />
+                    <Plus className="me-2 app-h-4 app-w-4" />
                     Set Budget
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-md">
+                <DialogContent className="app-max-w-md">
                   <DialogHeader>
                     <DialogTitle>Set Budget</DialogTitle>
                     <DialogDescription>
@@ -219,7 +219,7 @@ export function BudgetManager({ accessToken, expenses }: BudgetManagerProps) {
                     </DialogDescription>
                   </DialogHeader>
                   <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="space-y-2">
+                    <div className="me-8 ms-8 mb-8">
                       <Label htmlFor="category">Category</Label>
                       <Select
                         value={formData.category}
@@ -236,7 +236,7 @@ export function BudgetManager({ accessToken, expenses }: BudgetManagerProps) {
                           ))}
                         </SelectContent>
                       </Select>
-                    </div>
+                    
 
                     <div className="space-y-2">
                       <Label htmlFor="amount">Budget Amount</Label>
@@ -251,12 +251,12 @@ export function BudgetManager({ accessToken, expenses }: BudgetManagerProps) {
                       />
                     </div>
 
-                    <div className="p-3 bg-muted/50 border border-border rounded-lg">
-                      <p className="text-sm text-muted-foreground">
+                    <div className="p-3 app-bg-muted-50 border border-keyline rounded-3">
+                      <p className="text-sm fg-2">
                         This budget will be set for: <strong>{new Date(selectedMonth + '-01').toLocaleDateString('default', { month: 'long', year: 'numeric' })}</strong>
                       </p>
                     </div>
-
+                            </div>
                     <DialogFooter>
                       <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                         Cancel
@@ -274,24 +274,24 @@ export function BudgetManager({ accessToken, expenses }: BudgetManagerProps) {
         <CardContent>
           {/* Overall Summary */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="p-4 bg-primary/10 border border-primary/20 rounded-xl shadow-xs">
-              <p className="text-sm text-muted-foreground mb-1">Total Budget</p>
-              <p className="text-2xl font-bold text-primary">{formatCurrency(totalBudget)}</p>
+            <div className="p-4 bg-muted-primary border border-subtle-primary rounded-4 shadow-xs">
+              <p className="text-sm fg-2 mb-1">Total Budget</p>
+              <p className="text-2xl fw-bold fg-primary">{formatCurrency(totalBudget)}</p>
             </div>
-            <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-xl shadow-xs">
-              <p className="text-sm text-muted-foreground mb-1">Total Spent</p>
-              <p className="text-2xl font-bold text-destructive">{formatCurrency(totalSpent)}</p>
+            <div className="p-4 bg-muted-danger border border-subtle-danger rounded-4 shadow-xs">
+              <p className="text-sm fg-2 mb-1">Total Spent</p>
+              <p className="text-2xl fw-bold fg-danger">{formatCurrency(totalSpent)}</p>
             </div>
-            <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl shadow-xs">
-              <p className="text-sm text-muted-foreground mb-1">Remaining</p>
-              <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{formatCurrency(totalRemaining)}</p>
+            <div className="p-4 bg-muted-success border border-subtle-success rounded-4 shadow-xs">
+              <p className="text-sm fg-2 mb-1">Remaining</p>
+              <p className="text-2xl fw-bold fg-success fg-success">{formatCurrency(totalRemaining)}</p>
             </div>
           </div>
 
           {/* Budget Categories */}
           <div className="space-y-4">
             {budgetStatus.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
+              <div className="text-center py-12 fg-2">
                 <p>No budgets set for this month</p>
                 <p className="text-sm">Click "Set Budget" to create your first budget</p>
               </div>
@@ -299,28 +299,28 @@ export function BudgetManager({ accessToken, expenses }: BudgetManagerProps) {
               budgetStatus.map((item) => (
                 <div
                   key={item.category}
-                  className="p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors"
+                  className="p-4 border border-keyline rounded-3 app-hover-muted app-transition"
                 >
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-semibold">{item.category}</h4>
+                  <div className="d-flex justify-content-between align-items-start mb-3">
+                    <div className="d-flex align-items-center gap-2">
+                      <h4 className="fw-semibold">{item.category}</h4>
                       {item.status === 'safe' && (
-                        <CheckCircle className="h-4 w-4 text-green-600" />
+                        <CheckCircle className="app-h-4 app-w-4 fg-success" />
                       )}
                       {item.status === 'warning' && (
-                        <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                        <AlertTriangle className="app-h-4 app-w-4 fg-warning" />
                       )}
                       {item.status === 'danger' && (
-                        <AlertCircle className="h-4 w-4 text-red-600" />
+                        <AlertCircle className="app-h-4 app-w-4 fg-danger" />
                       )}
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm text-gray-600">{formatCurrency(item.spent)} / {formatCurrency(item.budget)}
+                    <div className="text-end">
+                      <p className="text-sm fg-2">{formatCurrency(item.spent)} / {formatCurrency(item.budget)}
                       </p>
                       <p className={`text-xs ${
-                        item.status === 'danger' ? 'text-red-600' :
-                        item.status === 'warning' ? 'text-yellow-600' :
-                        'text-green-600'
+                        item.status === 'danger' ? 'fg-danger' :
+                        item.status === 'warning' ? 'fg-warning' :
+                        'fg-success'
                       }`}>
                         {item.percentage.toFixed(1)}% used
                       </p>
@@ -329,29 +329,29 @@ export function BudgetManager({ accessToken, expenses }: BudgetManagerProps) {
 
                   <Progress
                     value={item.percentage}
-                    className={`h-2 ${
-                      item.status === 'danger' ? '[&>div]:bg-red-600' :
-                      item.status === 'warning' ? '[&>div]:bg-yellow-600' :
-                      '[&>div]:bg-green-600'
+                    className={`app-h-2 ${
+                      item.status === 'danger' ? 'progress-fill-danger' :
+                      item.status === 'warning' ? 'progress-fill-warning' :
+                      'progress-fill-success'
                     }`}
                   />
 
-                  <div className="mt-2 flex justify-between text-sm">
-                    <span className="text-gray-600">Remaining:</span>
-                    <span className={`font-medium ${
-                      item.remaining > 0 ? 'text-green-600' : 'text-red-600'
+                  <div className="mt-2 d-flex justify-content-between text-sm">
+                    <span className="fg-2">Remaining:</span>
+                    <span className={`fw-medium ${
+                      item.remaining > 0 ? 'fg-success' : 'fg-danger'
                     }`}>
                       {formatCurrency(item.remaining)}
                     </span>
                   </div>
 
                   {item.status === 'danger' && (
-                    <div className="mt-3 p-2 bg-red-50 rounded text-sm text-red-700">
+                    <div className="mt-3 p-2 bg-subtle-danger rounded text-sm fg-danger">
                       ⚠️ You have exceeded your budget for this category!
                     </div>
                   )}
                   {item.status === 'warning' && (
-                    <div className="mt-3 p-2 bg-yellow-50 rounded text-sm text-yellow-700">
+                    <div className="mt-3 p-2 bg-subtle-warning rounded text-sm fg-warning">
                       ⚠️ You are approaching your budget limit
                     </div>
                   )}

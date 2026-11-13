@@ -57,7 +57,7 @@ Your currency system now includes **beautiful visual components** with flags, ic
 ✅ **Responsive** - Works on all screen sizes
 ✅ **Type-Safe** - Full TypeScript support
 ✅ **Accessible** - Proper semantic HTML
-✅ **Tailwind Styled** - Beautiful default styling
+✅ **Bootstrap 6 Styled** - Theme-aware component styling
 
 ### 📁 Files Created
 
@@ -196,7 +196,7 @@ All components automatically adapt to screen size!
 ```
 Small:   px-2 py-1 text-xs
 Medium:  px-3 py-1.5 text-sm    (default)
-Large:   px-4 py-2 text-base
+Large:   px-4 py-2 text-md
 ```
 
 ### 🔧 Customization
@@ -211,7 +211,7 @@ Easy to customize:
   name: 'Your Currency',
   flag: '🚩',
   icon: 'YOUR_ICON',
-  color: 'bg-custom-100 text-custom-800',
+  color: 'bg-muted-primary fg-primary',
 }
 ```
 
@@ -231,7 +231,7 @@ Easy to customize:
 ✅ Complete settings page
 ✅ 12 currencies with flags and colors
 ✅ Type-safe TypeScript implementation
-✅ Tailwind CSS styling
+✅ Bootstrap 6 alpha styling
 ✅ Responsive design
 ✅ Comprehensive documentation
 

@@ -157,7 +157,7 @@ export function AssetManager({ accessToken, assets, onRefresh }: AssetManagerPro
       {/* Header */}
       <Card>
         <CardHeader>
-          <div className="flex justify-between items-center">
+          <div className="d-flex justify-content-between align-items-center">
             <div>
               <CardTitle>{t('assets')}</CardTitle>
               <CardDescription>{t('manageYourFinances')}</CardDescription>
@@ -165,11 +165,11 @@ export function AssetManager({ accessToken, assets, onRefresh }: AssetManagerPro
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button onClick={resetForm}>
-                  <Plus className="mr-2 h-4 w-4" />
+                  <Plus className="me-2 app-h-4 app-w-4" />
                   {t('addNewAsset')}
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-md">
+              <DialogContent className="app-max-w-md">
                 <DialogHeader>
                   <DialogTitle>{editingAsset ? t('edit') : t('addNewAsset')}</DialogTitle>
                   <DialogDescription>
@@ -177,6 +177,7 @@ export function AssetManager({ accessToken, assets, onRefresh }: AssetManagerPro
                   </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
+                   <div className="me-8 ms-8 mb-8">
                   <div className="space-y-2">
                     <Label htmlFor="name">{t('assetName')}</Label>
                     <Input
@@ -252,7 +253,7 @@ export function AssetManager({ accessToken, assets, onRefresh }: AssetManagerPro
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     />
                   </div>
-
+</div>
                   <DialogFooter>
                     <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                       Cancel
@@ -261,6 +262,7 @@ export function AssetManager({ accessToken, assets, onRefresh }: AssetManagerPro
                       {loading ? 'Saving...' : editingAsset ? 'Update' : 'Add'}
                     </Button>
                   </DialogFooter>
+                  
                 </form>
               </DialogContent>
             </Dialog>
@@ -269,27 +271,27 @@ export function AssetManager({ accessToken, assets, onRefresh }: AssetManagerPro
         <CardContent>
           {/* Portfolio Summary */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="p-4 bg-primary/10 border border-primary/20 rounded-xl shadow-xs">
-              <p className="text-sm text-muted-foreground mb-1">Total Value</p>
-              <p className="text-2xl font-bold text-primary">{formatCurrency(totalValue)}</p>
+            <div className="p-4 bg-muted-primary border border-subtle-primary rounded-4 shadow-xs">
+              <p className="text-sm fg-2 mb-1">Total Value</p>
+              <p className="text-2xl fw-bold fg-primary">{formatCurrency(totalValue)}</p>
             </div>
-            <div className="p-4 bg-muted/50 border border-border rounded-lg">
-              <p className="text-sm text-muted-foreground mb-1">Total Invested</p>
-              <p className="text-2xl font-bold text-foreground">{formatCurrency(totalInvested)}</p>
+            <div className="p-4 app-bg-muted-50 border border-keyline rounded-3">
+              <p className="text-sm fg-2 mb-1">Total Invested</p>
+              <p className="text-2xl fw-bold fg-body">{formatCurrency(totalInvested)}</p>
             </div>
-            <div className={`p-4 rounded-xl border shadow-xs ${totalGain >= 0 ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-destructive/10 border-destructive/20'}`}>
-              <p className="text-sm text-muted-foreground mb-1">Total Gain/Loss</p>
-              <div className="flex items-center gap-2">
-                <p className={`text-2xl font-bold ${totalGain >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'}`}>
+            <div className={`p-4 rounded-4 border shadow-xs ${totalGain >= 0 ? 'bg-muted-success border-subtle-success' : 'bg-muted-danger border-subtle-danger'}`}>
+              <p className="text-sm fg-2 mb-1">Total Gain/Loss</p>
+              <div className="d-flex align-items-center gap-2">
+                <p className={`text-2xl fw-bold ${totalGain >= 0 ? 'fg-success fg-success' : 'fg-danger'}`}>
                   {formatCurrency(Math.abs(totalGain))}
                 </p>
                 {totalGain >= 0 ? (
-                  <TrendingUp className="h-5 w-5 text-emerald-500" />
+                  <TrendingUp className="app-h-5 app-w-5 fg-success" />
                 ) : (
-                  <TrendingDown className="h-5 w-5 text-destructive" />
+                  <TrendingDown className="app-h-5 app-w-5 fg-danger" />
                 )}
               </div>
-              <p className={`text-xs ${totalGain >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'}`}>
+              <p className={`text-xs ${totalGain >= 0 ? 'fg-success fg-success' : 'fg-danger'}`}>
                 {totalGain >= 0 ? '+' : ''}{gainPercentage}%
               </p>
             </div>
@@ -298,7 +300,7 @@ export function AssetManager({ accessToken, assets, onRefresh }: AssetManagerPro
           {/* Asset List */}
           <div className="space-y-4">
             {assets.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
+              <div className="text-center py-12 fg-2">
                 <p>No assets found</p>
                 <p className="text-sm">Add your first asset to start tracking</p>
               </div>
@@ -312,57 +314,57 @@ export function AssetManager({ accessToken, assets, onRefresh }: AssetManagerPro
                   return (
                     <div
                       key={asset.id}
-                      className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors"
+                      className="d-flex align-items-center justify-content-between p-4 border border-keyline rounded-3 app-hover-muted app-transition"
                     >
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-semibold text-lg">{asset.name}</h4>
-                          <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded">
+                      <div className="flex-fill">
+                        <div className="d-flex align-items-center gap-2">
+                          <h4 className="fw-semibold text-lg">{asset.name}</h4>
+                          <span className="text-xs bg-1 fg-2 px-2 py-1 rounded">
                             {asset.type}
                           </span>
                         </div>
                         {asset.description && (
-                          <p className="text-sm text-muted-foreground mt-1">{asset.description}</p>
+                          <p className="text-sm fg-2 mt-1">{asset.description}</p>
                         )}
-                        <div className="flex gap-4 mt-2 text-sm text-gray-600">
+                        <div className="d-flex gap-4 mt-2 text-sm fg-2">
                           <div>
-                            <span className="font-medium">Purchased:</span> {formatCurrency(asset.purchasePrice)}
+                            <span className="fw-medium">Purchased:</span> {formatCurrency(asset.purchasePrice)}
                           </div>
                           <div>
-                            <span className="font-medium">Date:</span>{' '}
+                            <span className="fw-medium">Date:</span>{' '}
                             {new Date(asset.purchaseDate).toLocaleDateString()}
                           </div>
                         </div>
-                        <div className={`flex items-center gap-2 mt-2 ${gain >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        <div className={`d-flex align-items-center gap-2 mt-2 ${gain >= 0 ? 'fg-success' : 'fg-danger'}`}>
                           {gain >= 0 ? (
-                            <TrendingUp className="h-4 w-4" />
+                            <TrendingUp className="app-h-4 app-w-4" />
                           ) : (
-                            <TrendingDown className="h-4 w-4" />
+                            <TrendingDown className="app-h-4 app-w-4" />
                           )}
-                          <span className="text-sm font-medium">
+                          <span className="text-sm fw-medium">
                             {gain >= 0 ? '+' : ''}{formatCurrency(Math.abs(gain))} ({gain >= 0 ? '+' : ''}{gainPercent}%)
                           </span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-4">
-                        <div className="text-right">
-                          <p className="text-xs text-gray-500 mb-1">Current Value</p>
-                          <p className="font-bold text-xl">{formatCurrency(asset.currentValue)}</p>
+                      <div className="d-flex align-items-center gap-4">
+                        <div className="text-end">
+                          <p className="text-xs fg-2 mb-1">Current Value</p>
+                          <p className="fw-bold text-xl">{formatCurrency(asset.currentValue)}</p>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="d-flex gap-2">
                           <Button
                             size="icon"
                             variant="ghost"
                             onClick={() => handleEdit(asset)}
                           >
-                            <Pencil className="h-4 w-4" />
+                            <Pencil className="app-h-4 app-w-4" />
                           </Button>
                           <Button
                             size="icon"
                             variant="ghost"
                             onClick={() => handleDelete(asset.id)}
                           >
-                            <Trash2 className="h-4 w-4 text-red-600" />
+                            <Trash2 className="app-h-4 app-w-4 fg-danger" />
                           </Button>
                         </div>
                       </div>

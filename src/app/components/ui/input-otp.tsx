@@ -17,10 +17,10 @@ function InputOTP({
     <OTPInput
       data-slot="input-otp"
       containerClassName={cn(
-        "flex items-center gap-2 has-disabled:opacity-50",
+        "d-flex align-items-center gap-2 app-disabled",
         containerClassName,
       )}
-      className={cn("disabled:cursor-not-allowed", className)}
+      className={cn("app-disabled", className)}
       {...props}
     />
   );
@@ -30,7 +30,7 @@ function InputOTPGroup({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="input-otp-group"
-      className={cn("flex items-center gap-1", className)}
+      className={cn("d-flex align-items-center gap-1", className)}
       {...props}
     />
   );
@@ -51,15 +51,15 @@ function InputOTPSlot({
       data-slot="input-otp-slot"
       data-active={isActive}
       className={cn(
-        "data-[active=true]:border-ring data-[active=true]:ring-ring/50 data-[active=true]:aria-invalid:ring-destructive/20 dark:data-[active=true]:aria-invalid:ring-destructive/40 aria-invalid:border-destructive data-[active=true]:aria-invalid:border-destructive dark:bg-input/30 border-input relative flex h-9 w-9 items-center justify-center border-y border-r text-sm bg-input-background transition-all outline-none first:rounded-l-md first:border-l last:rounded-r-md data-[active=true]:z-10 data-[active=true]:ring-[3px]",
+        "radix-active radix-active radix-invalid radix-invalid app-invalid radix-invalid app-dark-input app-border-input position-relative d-flex app-h-9 app-w-9 align-items-center justify-content-center border-y border-end text-sm app-bg-input app-transition app-outline-none app-first-child app-first-border app-last-child radix-active radix-active",
         className,
       )}
       {...props}
     >
       {char}
       {hasFakeCaret && (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <div className="animate-caret-blink bg-foreground h-4 w-px duration-1000" />
+        <div className="pe-none position-absolute app-inset-0 d-flex align-items-center justify-content-center">
+          <div className="app-caret-blink bg-fg app-h-4 app-w-px " />
         </div>
       )}
     </div>
