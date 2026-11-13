@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -16,8 +16,15 @@ interface Expense {
   category: string;
   description: string;
   date: string;
+  bankAccountId?: string;
   recurring?: boolean;
   tags?: string[];
+}
+
+interface BankAccount {
+  id: string;
+  accountName: string;
+  bankName: string;
 }
 
 interface ExpenseManagerProps {
@@ -27,19 +34,39 @@ interface ExpenseManagerProps {
 }
 
 const EXPENSE_CATEGORIES = [
-  'Groceries',
-  'Utilities',
-  'Transportation',
-  'Entertainment',
-  'Healthcare',
-  'Shopping',
-  'Dining',
-  'Education',
-  'Insurance',
-  'Other',
+  "Ashsih Traders",
+  "Beauty & Personal Care",
+  "Clothing & Apparel",
+  "Education & School Supplies",
+  "Electricity & Power",
+  "EMI",
+  "Entertainment & Leisure",
+  "Food & Groceries",
+  "Furniture & Decor",
+  "Gas & Cooking Fuel",
+  "Gifts & Donations",
+  "Healthcare & Medical",
+  "Home Maintenance & Repairs",
+  "Insurance (Health, Home, Life)",
+  "Internet & Cable",
+  "J V",
+  "Mukesh Bakery",
+  "Personal",
+  "Pets & Pet Care",
+  "Rent or Mortgage",
+  "Shreechand",
+  "Streaming Services & Subscriptions",
+  "Taxes & Government Fees",
+  "Telephone & Mobile Bills",
+  "Transportation & Fuel",
+  "Water & Sewage",
+  "Other"
 ];
 
 export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseManagerProps) {
+  const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
+  const [bankAccountsLoading, setBankAccountsLoading] = useState(false);
+  const [bankAccountsError, setBankAccountsError] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const t = useTranslation();
@@ -49,12 +76,41 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
     category: '',
     description: '',
     date: new Date().toISOString().split('T')[0],
+    bankAccountId: '',
     recurring: false,
     tags: '',
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isDialogOpen) return;
+
+    const fetchBankAccounts = async () => {
+      setBankAccountsLoading(true);
+      setBankAccountsError(false);
+      try {
+        const response = await fetch(`${API_BASE_URL}/bank-accounts`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch bank accounts');
+        }
+        const data = await response.json();
+        setBankAccounts(data.bankAccounts || []);
+      } catch (error) {
+        console.error('Error fetching bank accounts:', error);
+        setBankAccountsError(true);
+      } finally {
+        setBankAccountsLoading(false);
+      }
+    };
+
+    fetchBankAccounts();
+  }, [accessToken, isDialogOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,6 +122,7 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
         category: formData.category,
         description: formData.description,
         date: formData.date,
+        bankAccountId: formData.bankAccountId || undefined,
         recurring: formData.recurring,
         tags: formData.tags ? formData.tags.split(',').map(t => t.trim()) : [],
       };
@@ -140,6 +197,7 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
       category: expense.category,
       description: expense.description,
       date: expense.date,
+      bankAccountId: expense.bankAccountId || '',
       recurring: expense.recurring || false,
       tags: expense.tags?.join(', ') || '',
     });
@@ -152,6 +210,7 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
       category: '',
       description: '',
       date: new Date().toISOString().split('T')[0],
+      bankAccountId: '',
       recurring: false,
       tags: '',
     });
@@ -219,6 +278,38 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
                         ))}
                       </SelectContent>
                     </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="bankAccountId">Bank Account (optional)</Label>
+                    <Select
+                      value={formData.bankAccountId || 'unassigned'}
+                      onValueChange={(value) => setFormData({
+                        ...formData,
+                        bankAccountId: value === 'unassigned' ? '' : value,
+                      })}
+                    >
+                      <SelectTrigger id="bankAccountId">
+                        <SelectValue placeholder="Select a bank account" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="unassigned">No bank account</SelectItem>
+                        {bankAccounts.map((account) => (
+                          <SelectItem key={account.id} value={account.id}>
+                            {account.accountName} ({account.bankName})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {bankAccountsError && (
+                      <p className="text-sm text-destructive">Bank accounts could not be loaded.</p>
+                    )}
+                    {bankAccountsLoading && (
+                      <p className="text-sm text-muted-foreground">Loading bank accounts...</p>
+                    )}
+                    {!bankAccountsLoading && !bankAccountsError && bankAccounts.length === 0 && (
+                      <p className="text-sm text-muted-foreground">No bank accounts available.</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -342,6 +433,11 @@ export function ExpenseManager({ accessToken, expenses, onRefresh }: ExpenseMana
                         )}
                       </div>
                       <p className="text-sm text-muted-foreground">{expense.category}</p>
+                      {expense.bankAccountId && (
+                        <p className="text-xs text-muted-foreground">
+                          {bankAccounts.find((account) => account.id === expense.bankAccountId)?.accountName || 'Bank account'}
+                        </p>
+                      )}
                       <p className="text-xs text-muted-foreground">
                         {new Date(expense.date).toLocaleDateString()}
                       </p>

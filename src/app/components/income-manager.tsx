@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -15,9 +15,16 @@ interface Income {
   amount: number;
   source: string;
   date: string;
+  bankAccountId?: string;
   category?: string;
   recurring?: boolean;
   description?: string;
+}
+
+interface BankAccount {
+  id: string;
+  accountName: string;
+  bankName: string;
 }
 
 interface IncomeManagerProps {
@@ -40,6 +47,9 @@ const INCOME_SOURCES = [
 ];
 
 export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerProps) {
+  const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
+  const [bankAccountsLoading, setBankAccountsLoading] = useState(false);
+  const [bankAccountsError, setBankAccountsError] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingIncome, setEditingIncome] = useState<Income | null>(null);
   const t = useTranslation();
@@ -49,10 +59,39 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
     source: '',
     date: new Date().toISOString().split('T')[0],
     description: '',
+    bankAccountId: '',
     recurring: false,
   });
   const [filterSource, setFilterSource] = useState('all');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isDialogOpen) return;
+
+    const fetchBankAccounts = async () => {
+      setBankAccountsLoading(true);
+      setBankAccountsError(false);
+      try {
+        const response = await fetch(`${API_BASE_URL}/bank-accounts`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch bank accounts');
+        }
+        const data = await response.json();
+        setBankAccounts(data.bankAccounts || []);
+      } catch (error) {
+        console.error('Error fetching bank accounts:', error);
+        setBankAccountsError(true);
+      } finally {
+        setBankAccountsLoading(false);
+      }
+    };
+
+    fetchBankAccounts();
+  }, [accessToken, isDialogOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,6 +103,7 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
         source: formData.source,
         date: formData.date,
         description: formData.description,
+        bankAccountId: formData.bankAccountId || null,
         recurring: formData.recurring,
       };
 
@@ -127,6 +167,7 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
       source: income.source,
       date: income.date,
       description: income.description || '',
+      bankAccountId: income.bankAccountId || '',
       recurring: income.recurring || false,
     });
     setIsDialogOpen(true);
@@ -138,6 +179,7 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
       source: '',
       date: new Date().toISOString().split('T')[0],
       description: '',
+      bankAccountId: '',
       recurring: false,
     });
     setEditingIncome(null);
@@ -258,6 +300,37 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
                       </Select>
                     </div>
                     <div className="space-y-2">
+                      <Label htmlFor="incomeBankAccountId">Bank Account (optional)</Label>
+                      <Select
+                        value={formData.bankAccountId || 'unassigned'}
+                        onValueChange={(value) => setFormData({
+                          ...formData,
+                          bankAccountId: value === 'unassigned' ? '' : value,
+                        })}
+                      >
+                        <SelectTrigger id="incomeBankAccountId">
+                          <SelectValue placeholder="Select a bank account" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="unassigned">No bank account</SelectItem>
+                          {bankAccounts.map((account) => (
+                            <SelectItem key={account.id} value={account.id}>
+                              {account.accountName} ({account.bankName})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {bankAccountsError && (
+                        <p className="text-sm text-destructive">Bank accounts could not be loaded.</p>
+                      )}
+                      {bankAccountsLoading && (
+                        <p className="text-sm text-muted-foreground">Loading bank accounts...</p>
+                      )}
+                      {!bankAccountsLoading && !bankAccountsError && bankAccounts.length === 0 && (
+                        <p className="text-sm text-muted-foreground">No bank accounts available.</p>
+                      )}
+                    </div>
+                    <div className="space-y-2">
                       <Label htmlFor="date">{t('date')}</Label>
                       <Input
                         id="date"
@@ -350,6 +423,11 @@ export function IncomeManager({ accessToken, income, onRefresh }: IncomeManagerP
                         </div>
                         {item.description && (
                           <p className="text-sm text-gray-600 mt-1">{item.description}</p>
+                        )}
+                        {item.bankAccountId && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {bankAccounts.find((account) => account.id === item.bankAccountId)?.accountName || 'Bank account'}
+                          </p>
                         )}
                         <p className="text-xs text-gray-500 mt-1">
                           {new Date(item.date).toLocaleDateString()}

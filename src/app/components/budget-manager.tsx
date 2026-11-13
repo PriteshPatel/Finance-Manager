@@ -31,16 +31,33 @@ interface BudgetManagerProps {
 }
 
 const EXPENSE_CATEGORIES = [
-  'Groceries',
-  'Utilities',
-  'Transportation',
-  'Entertainment',
-  'Healthcare',
-  'Shopping',
-  'Dining',
-  'Education',
-  'Insurance',
-  'Other',
+  "Ashsih Traders",
+  "Beauty & Personal Care",
+  "Clothing & Apparel",
+  "Education & School Supplies",
+  "Electricity & Power",
+  "EMI",
+  "Entertainment & Leisure",
+  "Food & Groceries",
+  "Furniture & Decor",
+  "Gas & Cooking Fuel",
+  "Gifts & Donations",
+  "Healthcare & Medical",
+  "Home Maintenance & Repairs",
+  "Insurance (Health, Home, Life)",
+  "Internet & Cable",
+  "J V",
+  "Mukesh Bakery",
+  "Personal",
+  "Pets & Pet Care",
+  "Rent or Mortgage",
+  "Shreechand",
+  "Streaming Services & Subscriptions",
+  "Taxes & Government Fees",
+  "Telephone & Mobile Bills",
+  "Transportation & Fuel",
+  "Water & Sewage",
+  "Other"
 ];
 
 export function BudgetManager({ accessToken, expenses }: BudgetManagerProps) {

@@ -1,4 +1,15 @@
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { Button } from './ui/button';
+import { Calendar as CalendarComponent } from './ui/calendar';
 import { useTranslation } from '../hooks/useTranslation';
 import {
   PieChart,
@@ -16,6 +27,7 @@ import {
   Cell,
 } from 'recharts';
 import { useFormatCurrency } from '../hooks/useFormatCurrency';
+import { format, subDays, startOfDay, endOfDay } from 'date-fns';
 
 interface Expense {
   id: string;
@@ -51,6 +63,57 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82ca9d'
 export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashboardProps) {
   const t = useTranslation();
   const formatCurrency = useFormatCurrency();
+  const [dateRange, setDateRange] = useState<string>('last30days');
+  const [customStartDate, setCustomStartDate] = useState<Date | undefined>(undefined);
+  const [customEndDate, setCustomEndDate] = useState<Date | undefined>(undefined);
+
+  // Calculate date range based on selection
+  const getDateRange = (): { start: Date; end: Date } => {
+    const now = new Date();
+    switch (dateRange) {
+      case 'last7days':
+        return { start: subDays(now, 7), end: now };
+      case 'last30days':
+        return { start: subDays(now, 30), end: now };
+      case 'thisMonth':
+        return { start: new Date(now.getFullYear(), now.getMonth(), 1), end: now };
+      case 'custom':
+        return {
+          start: customStartDate ? startOfDay(customStartDate) : subDays(now, 30),
+          end: customEndDate ? endOfDay(customEndDate) : now,
+        };
+      default:
+        return { start: subDays(now, 30), end: now };
+    }
+  };
+
+  const { start: startDate, end: endDate } = getDateRange();
+
+  // Calculate day-to-day income and expenses for the selected range
+  const dailyData = () => {
+    const data: { date: string; income: number; expenses: number }[] = [];
+    let current = new Date(startDate);
+    let safety = 0;
+    while (current <= endDate && safety < 366) {
+      const dateStr = format(current, 'yyyy-MM-dd');
+      const dayIncome = income
+        .filter(i => i.date === dateStr)
+        .reduce((sum, i) => sum + i.amount, 0);
+      const dayExpenses = expenses
+        .filter(e => e.date === dateStr)
+        .reduce((sum, e) => sum + e.amount, 0);
+      data.push({
+        date: format(current, 'MMM dd'),
+        income: dayIncome,
+        expenses: dayExpenses,
+      });
+      current = new Date(current.setDate(current.getDate() + 1));
+      safety++;
+    }
+    return data;
+  };
+
+  const dailyIncomeVsExpenses = dailyData();
   // Calculate expense by category
   const expensesByCategory = expenses.reduce((acc, expense) => {
     const existing = acc.find(item => item.name === expense.category);
@@ -75,7 +138,7 @@ export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashbo
 
   // Monthly trends (last 6 months)
   const monthlyData = [];
-  for (let i = 5; i >= 0; i--) {
+  for (let i = 11; i >= 0; i--) {
     const date = new Date();
     date.setMonth(date.getMonth() - i);
     const monthName = date.toLocaleString('default', { month: 'short' });
@@ -206,6 +269,87 @@ export function AnalyticsDashboard({ expenses, income, assets }: AnalyticsDashbo
           ) : (
             <div className="flex items-center justify-center h-[300px] text-muted-foreground">
               No transaction data available
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Daily Trend Chart with Date Range Selection */}
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <CardTitle>{t('dailyTrend')}</CardTitle>
+              <CardDescription>{t('dailyTrendDescription')}</CardDescription>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Select value={dateRange} onValueChange={setDateRange}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Select range" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="last7days">{t('last7Days')}</SelectItem>
+                  <SelectItem value="last30days">{t('last30Days')}</SelectItem>
+                  <SelectItem value="thisMonth">{t('thisMonth')}</SelectItem>
+                  <SelectItem value="custom">{t('custom')}</SelectItem>
+                </SelectContent>
+              </Select>
+              {dateRange === 'custom' && (
+                <div className="flex items-center gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="w-[140px] justify-start text-left font-normal">
+                        {customStartDate ? format(customStartDate, 'MMM dd') : t('from')}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <CalendarComponent
+                        mode="single"
+                        selected={customStartDate}
+                        onSelect={setCustomStartDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="w-[140px] justify-start text-left font-normal">
+                        {customEndDate ? format(customEndDate, 'MMM dd') : t('to')}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <CalendarComponent
+                        mode="single"
+                        selected={customEndDate}
+                        onSelect={setCustomEndDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              )}
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {dailyIncomeVsExpenses.some(d => d.income > 0 || d.expenses > 0) ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={dailyIncomeVsExpenses}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.6} />
+                <XAxis dataKey="date" stroke="var(--muted-foreground)" fontSize={12} />
+                <YAxis stroke="var(--muted-foreground)" fontSize={12} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '0.5rem', color: 'var(--card-foreground)' }}
+                  formatter={(value: number) => [formatCurrency(value), '']}
+                />
+                <Legend />
+                <Line type="monotone" dataKey="income" stroke="#10b981" strokeWidth={2} name="Income" />
+                <Line type="monotone" dataKey="expenses" stroke="#ef4444" strokeWidth={2} name="Expenses" />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+              No transaction data available for selected date range
             </div>
           )}
         </CardContent>

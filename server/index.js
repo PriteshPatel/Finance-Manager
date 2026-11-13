@@ -181,34 +181,64 @@ app.get('/expenses', verifyToken, (_req, res) => {
 });
 
 // Create expense
-app.post('/expenses', verifyToken, (req, res) => {
+app.post('/expenses', verifyToken, async (req, res) => {
   try {
     const userId = req.userId;
     if (!db) return res.status(503).json({ error: 'Database not available' });
     
-    const { amount, category, description, date, recurring, tags } = req.body;
+    const { amount, category, description, date, bankAccountId, recurring, tags } = req.body;
+    const expenseAmount = Number(amount);
+    if (!Number.isFinite(expenseAmount) || expenseAmount <= 0) {
+      return res.status(400).json({ error: 'Expense amount must be greater than zero' });
+    }
+
+    let accountObjectId;
+    if (bankAccountId) {
+      if (!ObjectId.isValid(bankAccountId)) {
+        return res.status(400).json({ error: 'Invalid bank account' });
+      }
+
+      accountObjectId = new ObjectId(bankAccountId);
+      const accountUpdate = await db.collection('bankAccounts').updateOne(
+        { _id: accountObjectId, userId },
+        { $inc: { balance: -expenseAmount }, $set: { updatedAt: new Date() } }
+      );
+      if (accountUpdate.matchedCount === 0) {
+        return res.status(404).json({ error: 'Bank account not found' });
+      }
+    }
+
     const expense = {
       userId,
-      amount: parseFloat(amount),
+      amount: expenseAmount,
       category,
       description,
       date,
+      bankAccountId: bankAccountId || null,
       recurring: recurring || false,
       tags: tags || [],
       createdAt: new Date(),
       updatedAt: new Date(),
     };
 
-    db.collection('expenses').insertOne(expense)
-      .then(result => {
-        expense.id = result.insertedId.toString();
-        expense._id = result.insertedId;
-        res.status(201).json({ expense });
-      })
-      .catch(error => {
-        console.error('Error creating expense:', error);
-        res.status(500).json({ error: 'Failed to create expense' });
-      });
+    try {
+      const result = await db.collection('expenses').insertOne(expense);
+      expense.id = result.insertedId.toString();
+      expense._id = result.insertedId;
+      res.status(201).json({ expense });
+    } catch (error) {
+      if (accountObjectId) {
+        try {
+          await db.collection('bankAccounts').updateOne(
+            { _id: accountObjectId, userId },
+            { $inc: { balance: expenseAmount }, $set: { updatedAt: new Date() } }
+          );
+        } catch (rollbackError) {
+          console.error('Error restoring bank account balance after expense creation failed:', rollbackError);
+        }
+      }
+      throw error;
+    }
   } catch (error) {
     console.error('Error creating expense:', error);
     res.status(500).json({ error: 'Failed to create expense' });
@@ -270,6 +300,15 @@ app.delete('/expenses/:id', verifyToken, (req, res) => {
 
 // ============= INCOME ENDPOINTS =============
 
+async function adjustIncomeBankAccountBalance(userId, accountId, amount) {
+  if (!accountId) return false;
+  const result = await db.collection('bankAccounts').updateOne(
+    { _id: new ObjectId(accountId), userId },
+    { $inc: { balance: amount }, $set: { updatedAt: new Date() } }
+  );
+  return result.matchedCount > 0;
+}
+
 // Get all income for user
 app.get('/income', verifyToken, (_req, res) => {
   try {
@@ -292,33 +331,54 @@ app.get('/income', verifyToken, (_req, res) => {
 });
 
 // Create income
-app.post('/income', verifyToken, (req, res) => {
+app.post('/income', verifyToken, async (req, res) => {
   try {
     const userId = req.userId;
     if (!db) return res.status(503).json({ error: 'Database not available' });
     
-    const { amount, source, date, description, recurring } = req.body;
+    const { amount, source, date, description, bankAccountId, recurring } = req.body;
+    const incomeAmount = Number(amount);
+    if (!Number.isFinite(incomeAmount) || incomeAmount <= 0) {
+      return res.status(400).json({ error: 'Income amount must be greater than zero' });
+    }
+    if (bankAccountId && !ObjectId.isValid(bankAccountId)) {
+      return res.status(400).json({ error: 'Invalid bank account' });
+    }
+
+    if (bankAccountId) {
+      const accountFound = await adjustIncomeBankAccountBalance(userId, bankAccountId, incomeAmount);
+      if (!accountFound) {
+        return res.status(404).json({ error: 'Bank account not found' });
+      }
+    }
+
     const income = {
       userId,
-      amount: parseFloat(amount),
+      amount: incomeAmount,
       source,
       date,
+      bankAccountId: bankAccountId || null,
       description: description || '',
       recurring: recurring || false,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
     
-    db.collection('income').insertOne(income)
-      .then(result => {
-        income.id = result.insertedId.toString();
-        income._id = result.insertedId;
-        res.status(201).json({ income });
-      })
-      .catch(error => {
-        console.error('Error creating income:', error);
-        res.status(500).json({ error: 'Failed to create income' });
-      });
+    try {
+      const result = await db.collection('income').insertOne(income);
+      income.id = result.insertedId.toString();
+      income._id = result.insertedId;
+      res.status(201).json({ income });
+    } catch (error) {
+      if (bankAccountId) {
+        try {
+          await adjustIncomeBankAccountBalance(userId, bankAccountId, -incomeAmount);
+        } catch (rollbackError) {
+          console.error('Error restoring bank account balance after income creation failed:', rollbackError);
+        }
+      }
+      throw error;
+    }
   } catch (error) {
     console.error('Error creating income:', error);
     res.status(500).json({ error: 'Failed to create income' });
@@ -326,31 +386,96 @@ app.post('/income', verifyToken, (req, res) => {
 });
 
 // Update income
-app.put('/income/:id', verifyToken, (req, res) => {
+app.put('/income/:id', verifyToken, async (req, res) => {
   try {
     const userId = req.userId;
     const incomeId = req.params.id;
     if (!db) return res.status(503).json({ error: 'Database not available' });
-    
-    const updates = req.body;
+
+    if (!ObjectId.isValid(incomeId)) {
+      return res.status(400).json({ error: 'Invalid income' });
+    }
+
+    const incomeCollection = db.collection('income');
+    const existingIncome = await incomeCollection.findOne({ _id: new ObjectId(incomeId), userId });
+    if (!existingIncome) {
+      return res.status(404).json({ error: 'Income not found' });
+    }
+
+    const updates = { ...req.body };
     delete updates.id;
     delete updates._id;
-    
-    db.collection('income').findOneAndUpdate(
-      { _id: new ObjectId(incomeId), userId },
-      { $set: { ...updates, updatedAt: new Date() } },
-      { returnDocument: 'after' }
-    ).then(result => {
+
+    const incomeAmount = updates.amount === undefined ? existingIncome.amount : Number(updates.amount);
+    if (!Number.isFinite(incomeAmount) || incomeAmount <= 0) {
+      return res.status(400).json({ error: 'Income amount must be greater than zero' });
+    }
+    const bankAccountId = Object.prototype.hasOwnProperty.call(updates, 'bankAccountId')
+      ? updates.bankAccountId
+      : existingIncome.bankAccountId;
+    if (bankAccountId && !ObjectId.isValid(bankAccountId)) {
+      return res.status(400).json({ error: 'Invalid bank account' });
+    }
+    if (bankAccountId) {
+      const accountExists = await db.collection('bankAccounts').findOne({
+        _id: new ObjectId(bankAccountId),
+        userId,
+      });
+      if (!accountExists) {
+        return res.status(404).json({ error: 'Bank account not found' });
+      }
+    }
+
+    const adjustments = new Map();
+    if (existingIncome.bankAccountId) {
+      adjustments.set(existingIncome.bankAccountId, -existingIncome.amount);
+    }
+    if (bankAccountId) {
+      adjustments.set(
+        bankAccountId,
+        (adjustments.get(bankAccountId) || 0) + incomeAmount
+      );
+    }
+
+    const appliedAdjustments = [];
+    try {
+      for (const [accountId, amount] of adjustments) {
+        if (amount === 0) continue;
+        const accountFound = await adjustIncomeBankAccountBalance(userId, accountId, amount);
+        if (!accountFound && accountId === bankAccountId) {
+          throw new Error('Bank account not found');
+        }
+        if (accountFound) appliedAdjustments.push({ accountId, amount });
+      }
+
+      updates.amount = incomeAmount;
+      updates.bankAccountId = bankAccountId || null;
+      const result = await incomeCollection.findOneAndUpdate(
+        { _id: new ObjectId(incomeId), userId },
+        { $set: { ...updates, updatedAt: new Date() } },
+        { returnDocument: 'after' }
+      );
       const doc = result && result.value;
       if (!doc) {
+        for (const applied of [...appliedAdjustments].reverse()) {
+          await adjustIncomeBankAccountBalance(userId, applied.accountId, -applied.amount);
+        }
         return res.status(404).json({ error: 'Income not found' });
       }
-      const income = { ...doc, id: doc._id.toString() };
-      res.json({ income });
-    }).catch(error => {
-      console.error('Error updating income:', error);
-      res.status(500).json({ error: 'Failed to update income' });
-    });
+      res.json({ income: { ...doc, id: doc._id.toString() } });
+    } catch (error) {
+      for (const applied of [...appliedAdjustments].reverse()) {
+        try {
+          await adjustIncomeBankAccountBalance(userId, applied.accountId, -applied.amount);
+        } catch (rollbackError) {
+          console.error('Error restoring bank account balance after income update failed:', rollbackError);
+        }
+      }
+      if (error.message === 'Bank account not found') {
+        return res.status(404).json({ error: 'Bank account not found' });
+      }
+      throw error;
+    }
   } catch (error) {
     console.error('Error updating income:', error);
     res.status(500).json({ error: 'Failed to update income' });
@@ -358,20 +483,50 @@ app.put('/income/:id', verifyToken, (req, res) => {
 });
 
 // Delete income
-app.delete('/income/:id', verifyToken, (req, res) => {
+app.delete('/income/:id', verifyToken, async (req, res) => {
   try {
     const userId = req.userId;
     const incomeId = req.params.id;
     if (!db) return res.status(503).json({ error: 'Database not available' });
-    
-    db.collection('income').deleteOne({ _id: new ObjectId(incomeId), userId })
-      .then(() => {
-        res.json({ success: true });
-      })
-      .catch(error => {
-        console.error('Error deleting income:', error);
-        res.status(500).json({ error: 'Failed to delete income' });
-      });
+
+    if (!ObjectId.isValid(incomeId)) {
+      return res.status(400).json({ error: 'Invalid income' });
+    }
+
+    const incomeCollection = db.collection('income');
+    const existingIncome = await incomeCollection.findOne({ _id: new ObjectId(incomeId), userId });
+    if (!existingIncome) {
+      return res.status(404).json({ error: 'Income not found' });
+    }
+
+    let balanceAdjusted = false;
+    if (existingIncome.bankAccountId && ObjectId.isValid(existingIncome.bankAccountId)) {
+      balanceAdjusted = await adjustIncomeBankAccountBalance(
+        userId,
+        existingIncome.bankAccountId,
+        -existingIncome.amount
+      );
+    }
+
+    try {
+      const result = await incomeCollection.deleteOne({ _id: existingIncome._id, userId });
+      if (result.deletedCount === 0) {
+        if (balanceAdjusted) {
+          await adjustIncomeBankAccountBalance(userId, existingIncome.bankAccountId, existingIncome.amount);
+        }
+        return res.status(404).json({ error: 'Income not found' });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      if (balanceAdjusted) {
+        try {
+          await adjustIncomeBankAccountBalance(userId, existingIncome.bankAccountId, existingIncome.amount);
+        } catch (rollbackError) {
+          console.error('Error restoring bank account balance after income deletion failed:', rollbackError);
+        }
+      }
+      throw error;
+    }
   } catch (error) {
     console.error('Error deleting income:', error);
     res.status(500).json({ error: 'Failed to delete income' });

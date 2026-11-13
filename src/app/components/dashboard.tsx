@@ -45,6 +45,7 @@ interface Expense {
   category: string;
   description: string;
   date: string;
+  bankAccountId?: string;
   recurring?: boolean;
 }
 
