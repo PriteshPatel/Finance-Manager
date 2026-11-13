@@ -84,10 +84,18 @@ export function FinancialDataTable<T>({
         <TableHeader>
           <TableRow>
             {columns.map((column) => (
-              <TableHead key={column.id} className={column.className}>
-                <button
+              <TableHead
+                key={column.id}
+                className={column.className}
+                aria-sort={sort.columnId === column.id
+                  ? sort.direction === 'asc' ? 'ascending' : 'descending'
+                  : 'none'}
+              >
+                <Button
                   type="button"
-                  className="fw-medium app-hover-foreground"
+                  variant="outline"
+                  size="sm"
+                  className="fw-medium text-nowrap gap-1"
                   onClick={() => toggleSort(column.id)}
                   aria-label={`Sort by ${column.header}${sort.columnId === column.id
                     ? sort.direction === 'asc' ? ', ascending' : ', descending'
@@ -95,9 +103,9 @@ export function FinancialDataTable<T>({
                 >
                   {column.header}
                   {sort.columnId === column.id && (
-                    <span aria-hidden="true">{sort.direction === 'asc' ? ' ↑' : ' ↓'}</span>
+                    <span aria-hidden="true">{sort.direction === 'asc' ? '↑' : '↓'}</span>
                   )}
-                </button>
+                </Button>
               </TableHead>
             ))}
             {renderActions && <TableHead className="text-end">Actions</TableHead>}
