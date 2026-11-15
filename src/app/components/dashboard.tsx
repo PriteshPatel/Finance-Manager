@@ -219,14 +219,14 @@ export function Dashboard({ accessToken, onLogout }: DashboardProps) {
 
           <Card className="border-keyline shadow-xs app-hover-shadow app-transition">
             <CardHeader className="d-flex flex-row align-items-center justify-content-between space-y-0 pb-2">
-              <CardTitle className="text-sm fw-medium">{t('monthlyExpenses')}</CardTitle>
+              <CardTitle className="text-sm fw-medium">{t('expenses')}</CardTitle>
               <div className="p-2 rounded-2 bg-muted-danger fg-danger">
                 <TrendingDown className="app-h-4 app-w-4" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl fw-bold fg-danger">{formatCurrency(monthlyExpenses)}</div>
-              <p className="text-xs fg-2 mt-1">{t('thisMonth')}</p>
+              <div className="text-2xl fw-bold fg-danger">{formatCurrency(totalExpenses)}</div>
+              <p className="text-xs fg-2 mt-1">{t('expenses')}</p>
             </CardContent>
           </Card>
 

@@ -36,6 +36,9 @@ interface ExpenseManagerProps {
 
 const EXPENSE_CATEGORIES = [
   "Ashsih Traders",
+  "Amul Gurukrupa",
+  "Amul RadheTraders",
+  "Atul Bakery",
   "Beauty & Personal Care",
   "Clothing & Apparel",
   "Education & School Supplies",
@@ -51,6 +54,7 @@ const EXPENSE_CATEGORIES = [
   "Insurance (Health, Home, Life)",
   "Internet & Cable",
   "J V",
+  "JSK Kharel",
   "Mukesh Bakery",
   "Personal",
   "Pets & Pet Care",
