@@ -34,7 +34,7 @@ interface ExpenseManagerProps {
   onRefresh: () => void;
 }
 
-const EXPENSE_CATEGORIES = [
+export const EXPENSE_CATEGORIES = [
   "Ashsih Traders",
   "Amul Gurukrupa",
   "Amul RadheTraders",

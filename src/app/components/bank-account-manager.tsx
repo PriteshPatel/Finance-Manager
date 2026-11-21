@@ -24,6 +24,7 @@ interface BankAccount {
 
 interface BankAccountManagerProps {
   accessToken: string;
+  refreshKey: number;
 }
 
 const ACCOUNT_TYPES = [
@@ -37,7 +38,7 @@ const ACCOUNT_TYPES = [
 
 const CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'INR'];
 
-export function BankAccountManager({ accessToken }: BankAccountManagerProps) {
+export function BankAccountManager({ accessToken, refreshKey }: BankAccountManagerProps) {
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<BankAccount | null>(null);
@@ -55,7 +56,7 @@ export function BankAccountManager({ accessToken }: BankAccountManagerProps) {
 
   useEffect(() => {
     fetchBankAccounts();
-  }, []);
+  }, [accessToken, refreshKey]);
 
   const fetchBankAccounts = async () => {
     try {

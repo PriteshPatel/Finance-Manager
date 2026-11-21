@@ -9,6 +9,7 @@ import { BudgetManager } from './budget-manager';
 import { AnalyticsDashboard } from './analytics-dashboard';
 import { BankAccountManager } from './bank-account-manager';
 import { CurrencySettings } from './currency-settings';
+import { StatementImageImport } from './statement-image-import';
 import { HeaderThemeSelector } from './ui/theme-selector';
 import { useFormatCurrency } from '../hooks/useFormatCurrency';
 import { useTranslation } from '../hooks/useTranslation';
@@ -23,7 +24,8 @@ import {
   PieChart, 
   BarChart3, 
   Settings, 
-  LayoutDashboard 
+  LayoutDashboard,
+  FileSpreadsheet,
 } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import { projectId, publicAnonKey } from '../../../utils/supabase/info';
@@ -70,6 +72,7 @@ export function Dashboard({ accessToken, onLogout }: DashboardProps) {
   const [income, setIncome] = useState<Income[]>([]);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
+  const [bankAccountsRefreshKey, setBankAccountsRefreshKey] = useState(0);
   const { selectedCurrency } = useCurrency();
   const formatCurrency = useFormatCurrency();
   const t = useTranslation();
@@ -138,6 +141,11 @@ export function Dashboard({ accessToken, onLogout }: DashboardProps) {
     } catch (error) {
       console.error('Error fetching assets:', error);
     }
+  };
+
+  const refreshAfterImportedTransaction = () => {
+    void Promise.all([fetchIncome(), fetchExpenses()]);
+    setBankAccountsRefreshKey((key) => key + 1);
   };
 
   const handleLogout = async () => {
@@ -275,6 +283,10 @@ export function Dashboard({ accessToken, onLogout }: DashboardProps) {
               <BarChart3 className="app-h-4 app-w-4 flex-shrink-0" />
               <span className="text-truncate">{t('analytics')}</span>
             </TabsTrigger>
+            <TabsTrigger value="import" className="app-h-11 py-2 px-3 text-xs app-sm-text-sm fw-medium gap-2 rounded-3 radix-tab-active radix-tab-active radix-tab-active app-transition">
+              <FileSpreadsheet className="app-h-4 app-w-4 flex-shrink-0" />
+              <span className="text-truncate">Spreadsheet Import</span>
+            </TabsTrigger>
             <TabsTrigger value="settings" className="app-h-11 py-2 px-3 text-xs app-sm-text-sm fw-medium gap-2 rounded-3 radix-tab-active radix-tab-active radix-tab-active app-transition">
               <Settings className="app-h-4 app-w-4 flex-shrink-0" />
               <span className="text-truncate">{t('settings')}</span>
@@ -316,6 +328,7 @@ export function Dashboard({ accessToken, onLogout }: DashboardProps) {
           <TabsContent value="bank">
             <BankAccountManager
               accessToken={accessToken}
+              refreshKey={bankAccountsRefreshKey}
             />
           </TabsContent>
 
@@ -331,6 +344,13 @@ export function Dashboard({ accessToken, onLogout }: DashboardProps) {
               expenses={expenses} 
               income={income} 
               assets={assets} 
+            />
+          </TabsContent>
+
+          <TabsContent value="import">
+            <StatementImageImport
+              accessToken={accessToken}
+              onTransactionSaved={refreshAfterImportedTransaction}
             />
           </TabsContent>
 

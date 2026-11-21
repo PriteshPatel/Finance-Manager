@@ -34,7 +34,7 @@ interface IncomeManagerProps {
   onRefresh: () => void;
 }
 
-const INCOME_SOURCES = [
+export const INCOME_SOURCES = [
   'Salary',
   'Freelance',
   'Investment',
